@@ -6,6 +6,7 @@ using System.Text;
 
 namespace OAuth
 {
+    [Serializable]
     public class OAuthBase
     {        
 

@@ -166,8 +166,7 @@ namespace OAuth
                 {
                     oauthUrl = normalizedUrl;
                 }
-                System.Diagnostics.Debug.WriteLine(oauthUrl); 
-
+              
                 System.Net.HttpWebRequest request = System.Net.HttpWebRequest.Create(oauthUrl) as System.Net.HttpWebRequest;
                 request.ProtocolVersion = HttpVersion.Version10;
              
@@ -181,7 +180,6 @@ namespace OAuth
                         postRequest.Append(param.Name + "=" + HttpUtility.UrlEncode(param.Value));
                     }*/
                     string postRequest = normalizedUrlWithParameters;
-                    System.Diagnostics.Debug.WriteLine(normalizedUrlWithParameters);
                     Byte[] bufferrequest = System.Text.Encoding.UTF8.GetBytes(postRequest + "&oauth_signature=" + HttpUtility.UrlEncode(signature) + "&scope=all");
                     request.Method = "POST";
                     request.ContentType = "application/x-www-form-urlencoded";
