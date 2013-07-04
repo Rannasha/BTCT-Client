@@ -13,8 +13,20 @@ using System.Net;
 
 namespace BTCTC
 {
-    public enum OrderType { OT_SELL, OT_BUY, OT_TIN, OT_TOUT, OT_UNKNOWN };
+    public enum OrderType { OT_SELL, OT_BUY, OT_CALL, OT_PUT, OT_TIN, OT_TOUT, OT_UNKNOWN};
     public enum AuthStatusType { AS_NONE, AS_REQRCV, AS_OK };
+
+    public delegate void AuthStatusChangedFunc(AuthStatusType newAS);
+
+    public class AuthStatusChangedEventArgs : EventArgs
+    {
+        public AuthStatusType AuthStatus { get; set; }
+
+        public AuthStatusChangedEventArgs(AuthStatusType t)
+        {
+            AuthStatus = t;
+        }
+    }
 
     public class BTCTUtils
     {
@@ -56,11 +68,11 @@ namespace BTCTC
 
         public static OrderType StringToOrderType(string s)
         {
-            if (s == "ask" || s == "sell")
+            if (s == "ask" || s == "sell" || s == "Market Sell")
             {
                 return OrderType.OT_SELL;
             }
-            if (s == "bid" || s == "buy")
+            if (s == "bid" || s == "buy" || s == "Market Buy")
             {
                 return OrderType.OT_BUY;
             }
@@ -71,6 +83,14 @@ namespace BTCTC
             if (s == "transfer-out")
             {
                 return OrderType.OT_TOUT;
+            }
+            if (s == "Call Option")
+            {
+                return OrderType.OT_CALL;
+            }
+            if (s == "Put Option")
+            {
+                return OrderType.OT_PUT;
             }
             return OrderType.OT_UNKNOWN;
         }
@@ -135,10 +155,56 @@ namespace BTCTC
             }
         }
 
+        public string ApiKey
+        {
+            get
+            {
+                return _oauthConsumer.OauthConfig.ApiKey;
+            }
+            set
+            {
+                _oauthConsumer.OauthConfig.ApiKey = value;
+            }
+        }
+
+        public event EventHandler AuthStatusChanged;
+
         #region Private Methods
+        private void ChangeAuthStatus(AuthStatusType t)
+        {
+            if (_authStatus != t)
+            {
+                _authStatus = t;
+                if (AuthStatusChanged != null)
+                {
+                    AuthStatusChangedEventArgs a = new AuthStatusChangedEventArgs(t);
+                    AuthStatusChanged(this, a);
+                }
+            }
+        }
+
         private string rawOauthRequest(List<QueryParameter> p)
         {
-            string response = (string)_oauthConsumer.request(_tradeUrl, "POST", p, "PLAIN");
+            string response;
+
+            try
+            {
+                response = (string)_oauthConsumer.request(_tradeUrl, "POST", p, "PLAIN");
+            }
+            catch (Exception e)
+            {
+                // At this stage, this error should occur only if the access token has expired (1 week of inactivity)
+                // or has been manually revoked on the API tab of the Account page.
+                ChangeAuthStatus(AuthStatusType.AS_NONE);
+                if (e.Message.Equals("The remote server returned an error: (401) Unauthorized."))
+                {
+                    throw (new BTCTAuthException("Unauthorized."));
+                }
+                else
+                {
+                    throw (new BTCTException("Unknown error with request. Message: " + e.Message));
+                }
+            }
 
             return response;
         }
@@ -162,7 +228,13 @@ namespace BTCTC
             {
                 throw (new BTCTException("Network Error. Message: " + ex.Message));
             }
+            if (c == "Request rate limit exceeded, come back in 60 seconds.\r\n")
+            {
+                BTCTException tantrum = new BTCTException("Request Error. Message: " + c);
 
+                throw tantrum; // I WANT MY DATA! I WANT IT NOW!               
+            }
+            
             return c;
         }
 
@@ -241,6 +313,35 @@ namespace BTCTC
             return t;
         }
 
+        private DividendHistory parseDividendHistory(string s)
+        {
+            DividendHistory dh = new DividendHistory();
+            List<Dividend> l = new List<Dividend>();
+
+            string[] lines = s.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 1; i < lines.Length; i++)
+            {
+                Dividend d = new Dividend();
+                Security se = new Security();
+
+                string[] fields = lines[i].Split(new Char[] { ',' });
+
+                se.name = fields[0];
+                d.shares = Convert.ToInt32(fields[1]);
+                d.dividend = BTCTUtils.StringToSatoshi(fields[2]);
+                d.dateTime = DateTime.Parse(fields[4].Substring(1, fields[4].Length - 2));
+                d.security = se;
+
+                l.Add(d);
+            }
+
+            dh.dividends = l;
+            dh.lastUpdate = DateTime.Now;
+
+            return dh;
+        }
+
         private void parseSuccess(string json)
         {
             // THROW ALL THE EXCEPTIONS! |o/
@@ -294,6 +395,8 @@ namespace BTCTC
             oc.SiteUrl = "";
             oc.OauthVersion = "1.0";
             oc.OauthSignatureMethod = "HMAC-SHA1";
+            oc.OauthCallback = "oob";
+            oc.OauthScope = "all";
             oc.ConsumerKey = _consumerKey;
             oc.ConsumerSecret = _consumerSecret;
             oc.RequestTokenUrl = "https://btct.co/oauth/request_token";
@@ -304,11 +407,13 @@ namespace BTCTC
             _authStatus = AuthStatusType.AS_NONE;
         }
 
+        #region Access / token management
         public void SerializeConfig(string filename)
         {
             Stream f = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
             IFormatter formatter = new BinaryFormatter();
             formatter.Serialize(f, _oauthConsumer.OauthConfig);
+            f.Close();
         }
 
         public void DeserializeConfig(string filename)
@@ -318,11 +423,17 @@ namespace BTCTC
                 Stream f = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
                 IFormatter formatter = new BinaryFormatter();
                 _oauthConsumer.OauthConfig = (OAuthConfig)formatter.Deserialize(f);
-                _authStatus = AuthStatusType.AS_OK;
+                // There is no guarantee that the deserialized access token is still valid. This should be checked by
+                // submitting an auth'ed request and checking the result.
+                if (_oauthConsumer.OauthConfig.OauthToken != "")
+                {
+                    ChangeAuthStatus(AuthStatusType.AS_OK);
+                }
+                f.Close();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw (new BTCTException("Error loading access token: " + ex.Message));
+                throw (new BTCTException("Error loading access token: " + e.Message, e));
             }
         }
 
@@ -331,11 +442,11 @@ namespace BTCTC
             try
             {
                 _oauthConsumer.getRequestToken();
-                _authStatus = AuthStatusType.AS_REQRCV;
+                ChangeAuthStatus(AuthStatusType.AS_REQRCV);
             }
             catch (Exception e)
             {
-                throw new BTCTAuthException("Unable to get request token.",e);
+                throw new BTCTAuthException("Unable to get request token: " + e.Message, e);
             }
         }
 
@@ -344,26 +455,35 @@ namespace BTCTC
             try
             {
                 _oauthConsumer.getAccessToken(verifier);
-                _authStatus = AuthStatusType.AS_OK;
+                ChangeAuthStatus(AuthStatusType.AS_OK);
             }
             catch (Exception e)
             {
-                throw new BTCTAuthException("Unable to get access token.",e);
+                throw new BTCTAuthException("Unable to get access token: " +e.Message, e);
             }
         }
+        #endregion
 
         public Portfolio getPortfolio()
         {
+            string response;
+            Portfolio pf;
             List<QueryParameter> p = new List<QueryParameter>();
             p.Add(new QueryParameter("act","get_portfolio"));
-            string response = rawOauthRequest(p);
-
-            Portfolio pf = parsePortfolio(response);
-
+            try
+            {
+                response = rawOauthRequest(p);
+                pf = parsePortfolio(response);
+            }
+            catch (BTCTException e)
+            {
+                throw e;
+            }
+            
             return pf;
         }
 
-        public string SubmitOrder(string security, int amount, long price, OrderType o, int expire)
+        public void SubmitOrder(string security, int amount, long price, OrderType o, int expire)
         {
             string orderString;
 
@@ -391,41 +511,100 @@ namespace BTCTC
             }
             p.Add(new QueryParameter(orderString + "_expiry_days", expire.ToString()));
 
-
-            string r = rawOauthRequest(p);
-
             try
             {
+                string r = rawOauthRequest(p);
                 parseSuccess(r);
             }
             catch (BTCTException e)
             {
                 throw (e);
             }
-            return r;
         }
 
         public TradeHistory GetTradeHistory(string apikey)
         {
             string s = rawHttpRequest(_csvUrl + "trades?key=" + apikey);
+            if (s == "Invalid api key.\r\n")
+            {
+                throw (new BTCTAuthException("Invalid api key."));
+            }
 
+            _oauthConsumer.OauthConfig.ApiKey = apikey;
             return parseTradeHistory(s);
         }
+
+        public void CancelOrder(int orderId)
+        {
+            List<QueryParameter> p = new List<QueryParameter>();
+
+            p.Add(new QueryParameter("order_id", orderId.ToString()));
+
+            try
+            {
+                string r = rawOauthRequest(p);
+                if (r == null)
+                {
+                    throw (new BTCTException("Invalid order ID"));
+                }
+                parseSuccess(r);
+            }
+            catch (BTCTException e)
+            {
+                throw (e);
+            }
+        }
+
+        public DividendHistory GetDividendHistory(string apikey)
+        {
+            string s = rawHttpRequest(_csvUrl + "dividends?key=" + apikey);
+            if (s == "Invalid api key.\r\n")
+            {
+                throw (new BTCTAuthException("Invalid api key."));
+            }
+
+            _oauthConsumer.OauthConfig.ApiKey = apikey;
+            return parseDividendHistory(s);
+        }
+
     }
 
     #region Data Storage Classes
+    public class Dividend
+    {
+        public Security security { get; set; }
+        public int shares { get; set; }
+        public long dividend { get; set; }
+        public long totalDividend
+        {
+            get
+            {
+                return shares * dividend;
+            }
+        }
+        public DateTime dateTime { get; set; }
+    }
+
+    // In principle it doesn't make much sense to declare a class with just a single field,
+    // but with an eye on future extensions, it's good to keep this structure in place.
     public class Security
     {
-        public int id { get; set; }
         public string name { get; set; }
     }
 
     public class Order
     {
-        public int id { get; set; }
         public Security security { get; set; }
+        public int id { get; set; }
         public int amount { get; set; }
         public long price { get; set; }
+        public long totalPrice
+        {
+            get
+            {
+                return amount * price;
+            }
+        }
         public OrderType orderType { get; set; }
         public bool active { get; set; }
         public DateTime dateTime { get; set; }
@@ -456,6 +635,27 @@ namespace BTCTC
     {
         public List<Order> orders { get; set; }
         public DateTime lastUpdate { get; set; }
+    }
+
+    public class DividendHistory
+    {
+        public List<Dividend> dividends { get; set; }
+        public DateTime lastUpdate { get; set; }
+
+        public long TotalDividends
+        {
+            get
+            {
+                // sum all div's
+                return 0;
+            }
+        }
+
+        public long DividendPerSecurity(string s)
+        {
+            // sum all div's for security s
+            return 0;
+        }
     }
     #endregion
 
