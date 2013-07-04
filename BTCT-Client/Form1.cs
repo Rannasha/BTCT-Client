@@ -21,8 +21,51 @@ namespace BTCTC
         public Form1()
         {
             InitializeComponent();
+            cbOrderType.SelectedIndex = 0;
+            cbExpiry.SelectedIndex = 0;
+            OnAuthStatusChanged(null, EventArgs.Empty);
             b = new BTCTLink(_consumerKey, _consumerSecret);
+            b.AuthStatusChanged += OnAuthStatusChanged;
         }
+
+        private void OnAuthStatusChanged(object sender, EventArgs e)
+        {
+            AuthStatusChangedEventArgs ea;
+
+            if (e.Equals(EventArgs.Empty))
+            {
+                ea = new AuthStatusChangedEventArgs(AuthStatusType.AS_NONE);
+            }
+            else
+            {
+                ea = (AuthStatusChangedEventArgs)e;
+            }
+
+            switch (ea.AuthStatus)
+            {
+                case AuthStatusType.AS_NONE:
+                    button1.Enabled = true;
+                    button2.Enabled = false;
+                    textBox3.ReadOnly = true;
+                    textBox2.Text = "None";
+                    break;
+                case AuthStatusType.AS_REQRCV:
+                    button1.Enabled = false;
+                    button2.Enabled = true;
+                    textBox3.ReadOnly = false;
+                    textBox2.Text = "Req-rcv";
+                    break;
+                case AuthStatusType.AS_OK:
+                    button1.Enabled = false;
+                    button2.Enabled = false;
+                    textBox3.ReadOnly = true;
+                    textBox2.Text = "Authorized";
+                    break;
+
+            }
+        
+        }
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -36,7 +79,16 @@ namespace BTCTC
 
         private void button3_Click(object sender, EventArgs e)
         {
-            Portfolio p = b.getPortfolio();
+            Portfolio p;
+            try
+            {
+                p = b.getPortfolio();
+            }
+            catch (BTCTException ex)
+            {
+                textBox4.Text += "Error getting portfolio. Error-message: " + ex.Message;
+                return;
+            }
     
             textBox4.Text = "User: " + p.username + Environment.NewLine;
             textBox4.Text += "Generated: " + p.lastUpdate.ToString() + Environment.NewLine;
@@ -65,6 +117,7 @@ namespace BTCTC
         private void button4_Click(object sender, EventArgs e)
         {
             b.DeserializeConfig("btct-client.dat");
+            textBox1.Text = b.ApiKey;
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -74,21 +127,23 @@ namespace BTCTC
 
         private void button6_Click(object sender, EventArgs e)
         {
-            try
-            {
-                string r = b.SubmitOrder("TAMINER", 1000, BTCTUtils.StringToSatoshi("0,01"), OrderType.OT_BUY, 0);
-                textBox4.Text += r + Environment.NewLine;
-            }
-            catch (BTCTException ex)
-            {
-                textBox4.Text += ex.Message + Environment.NewLine;
-            }
+
             
         }
 
         private void button7_Click(object sender, EventArgs e)
         {
-            TradeHistory t = b.GetTradeHistory(textBox1.Text);
+            TradeHistory t = null;
+
+            try
+            {
+                t = b.GetTradeHistory(textBox1.Text);
+            }
+            catch (Exception ex)
+            {
+                textBox4.Text += "Error obtaining trade history: " + ex.Message + Environment.NewLine;
+                return;
+            }
 
             for (int i = 0; i < t.orders.Count; i++)
             {
@@ -115,6 +170,100 @@ namespace BTCTC
                 textBox4.Text += Environment.NewLine;
             }
 
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            int id;
+
+            try
+            {
+                id = Convert.ToInt32(tbCancelOrderId.Text);
+            }
+            catch (Exception ex)
+            {
+                textBox4.Text += "Order ID field not a valid number." + Environment.NewLine;
+                return;
+            }
+            try
+            {
+                b.CancelOrder(id);
+            }
+            catch (BTCTException ex)
+            {
+                textBox4.Text += "Error cancelling order: " + ex.Message + Environment.NewLine;
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            string security = tbSecurity.Text;
+            int amount = 0;
+            double price = 0;
+            try
+            {
+                amount = Convert.ToInt32(tbAmount.Text);
+            }
+            catch (Exception ex)
+            {
+                textBox4.Text += "Invalid input for field 'amount'" + Environment.NewLine;
+                amount = -1;
+            }
+            try
+            {
+                price = Convert.ToDouble(tbPrice.Text);
+            }
+            catch (Exception ex)
+            {
+                textBox4.Text += "Invalid input for field 'price'" + Environment.NewLine;
+                amount = -1;
+            }
+            OrderType ot;
+            switch (cbOrderType.SelectedIndex)
+            {
+                case 0:
+                    ot = OrderType.OT_BUY;
+                    break;
+                case 1:
+                    ot = OrderType.OT_SELL;
+                    break;
+                default:
+                    ot = OrderType.OT_UNKNOWN;
+                    break;
+            }
+            int expiry = Convert.ToInt32(cbExpiry.Text);
+            if (amount > 0)
+            {
+                try
+                {
+                    b.SubmitOrder(security, amount, BTCTUtils.DoubleToSatoshi(price), ot, expiry);
+                    textBox4.Text += "Order submitted.";
+                }
+                catch (BTCTException ex)
+                {
+                    textBox4.Text += ex.Message + Environment.NewLine;
+                }
+            }
+        }
+
+        private void button6_Click_1(object sender, EventArgs e)
+        {
+            DividendHistory dh;
+            try
+            {
+                dh = b.GetDividendHistory(textBox1.Text);
+            }
+            catch (BTCTException ex)
+            {
+                textBox4.Text += "Error obtaining dividend history: " + ex.Message + Environment.NewLine;
+                return;
+            }
+
+            foreach (Dividend d in dh.dividends)
+            {
+                textBox4.Text += "[" + d.dateTime.ToString() + "] " + d.security.name + ": " + d.shares.ToString() + " x " 
+                        + BTCTUtils.SatoshiToString(d.dividend) + " = " + BTCTUtils.SatoshiToString(d.dividend * d.shares) + Environment.NewLine;
+            }
         }
 
 
