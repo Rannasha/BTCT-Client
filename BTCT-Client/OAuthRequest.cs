@@ -131,8 +131,8 @@ namespace OAuth
             parameters.Add(new QueryParameter("oauth_timestamp", this._generateTimestamp()));
             parameters.Add(new QueryParameter("oauth_signature_method", this._consumer.OauthConfig.OauthSignatureMethod));
             parameters.Add(new QueryParameter("oauth_version", this._consumer.OauthConfig.OauthVersion));
-            parameters.Add(new QueryParameter("oauth_callback", "oob"));
-            parameters.Add(new QueryParameter("scope", "all"));
+            parameters.Add(new QueryParameter("oauth_callback", this._consumer.OauthConfig.OauthCallback));
+            parameters.Add(new QueryParameter("scope", this._consumer.OauthConfig.OauthScope));
 
             // Add the OauthToken and OAuthTokenSecret if they are valued
             if (oauthToken != null && oauthToken != String.Empty && oauthToken.Length > 0)
@@ -160,7 +160,7 @@ namespace OAuth
                 string oauthUrl = "";
                 if (httpMethod == "GET")
                 {
-                    oauthUrl = normalizedUrl + "?" + normalizedUrlWithParameters + "&oauth_signature=" + HttpUtility.UrlEncode(signature) + "&scope=all";
+                    oauthUrl = normalizedUrl + "?" + normalizedUrlWithParameters + "&oauth_signature=" + HttpUtility.UrlEncode(signature) + "&scope=" + this._consumer.OauthConfig.OauthScope;
                 }
                 else
                 {
@@ -180,7 +180,7 @@ namespace OAuth
                         postRequest.Append(param.Name + "=" + HttpUtility.UrlEncode(param.Value));
                     }*/
                     string postRequest = normalizedUrlWithParameters;
-                    Byte[] bufferrequest = System.Text.Encoding.UTF8.GetBytes(postRequest + "&oauth_signature=" + HttpUtility.UrlEncode(signature) + "&scope=all");
+                    Byte[] bufferrequest = System.Text.Encoding.UTF8.GetBytes(postRequest + "&oauth_signature=" + HttpUtility.UrlEncode(signature) + "&scope=" + this._consumer.OauthConfig.OauthScope);
                     request.Method = "POST";
                     request.ContentType = "application/x-www-form-urlencoded";
                     request.ContentLength = bufferrequest.Length;
@@ -196,8 +196,8 @@ namespace OAuth
             }
             catch (WebException e)
             {
-                base._debug(e.Message);                
-                return "";
+                base._debug(e.Message);
+                throw e;
             }        
         }
     }

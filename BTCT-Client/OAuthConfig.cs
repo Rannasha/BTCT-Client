@@ -22,6 +22,13 @@ namespace OAuth
         private string _oauthSignatureMethod;
         private string _oauthCallback;
         private string _oauthScope;
+        private string _apiKey;
+
+        public string ApiKey
+        {
+            get { return _apiKey; }
+            set { _apiKey = value; }
+        }
 
         public string SiteUrl
         {

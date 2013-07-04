@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Xml;
+using System.Net;
 
 namespace OAuth
 {
@@ -94,13 +95,22 @@ namespace OAuth
         {            
             string oauth_token = this._oauthConfig.OauthToken;
             string oauth_token_secret = this._oauthConfig.OauthTokenSecret;
+            string response;
             OAuthRequest request = new OAuthRequest(this, base._debugType);
-            string response = request.request(new Uri(url), httpMethod, oauth_token, oauth_token_secret, parameters).ToString();
-            if (response == String.Empty || response.Length == 0)
+            try
             {
+                response = request.request(new Uri(url), httpMethod, oauth_token, oauth_token_secret, parameters).ToString();
+            }
+            catch (WebException e)
+            {
+                throw e;
+            }
+            if (response == String.Empty || response.Length == 0)
+            { 
                 base._debug("The Request Response was empty");
                 return null;
             }
+            
             Object result = null;
                         
             switch (responseFormat)
