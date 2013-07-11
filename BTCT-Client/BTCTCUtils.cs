@@ -15,6 +15,7 @@ namespace BTCTC
 {
     public enum OrderType { OT_SELL, OT_BUY, OT_CALL, OT_PUT, OT_TIN, OT_TOUT, OT_UNKNOWN};
     public enum AuthStatusType { AS_NONE, AS_REQRCV, AS_OK };
+    public enum SecurityType { ST_BOND, ST_STOCK, ST_FUND };
 
     public delegate void AuthStatusChangedFunc(AuthStatusType newAS);
 
@@ -205,7 +206,12 @@ namespace BTCTC
                     throw (new BTCTException("Unknown error with request. Message: " + e.Message));
                 }
             }
+            if (response == "Request rate limit exceeded, come back in 60 seconds.\r\n")
+            {            
+                BTCTException tantrum = new BTCTException("Request Error. Message: " + response);
 
+                throw tantrum; // I WANT MY DATA! I WANT IT NOW!               
+            }
             return response;
         }
 
@@ -567,9 +573,35 @@ namespace BTCTC
             return parseDividendHistory(s);
         }
 
+        public List<Ticker> GetTickers()
+        {
+            return null;
+        }
     }
 
     #region Data Storage Classes
+    public class Ticker : Security
+    {
+        public long last { get; set; }
+        public int lastQty { get; set; }
+        public long lo1d { get; set; }
+        public long hi1d { get; set; }
+        public long av1d { get; set; }
+        public int vol1d { get; set; }
+        public long volBTC1d { get; set; }
+        public long lo7d { get; set; }
+        public long hi7d { get; set; }
+        public long av7d { get; set; }
+        public int vol7d { get; set; }
+        public long volBTC7d { get; set; }
+        public long lo30d { get; set; }
+        public long hi30d { get; set; }
+        public long av30d { get; set; }
+        public int vol30d { get; set; }
+        public long volBTC30d { get; set; }
+        public int totalVol { get; set; }
+    }
+
     public class Dividend
     {
         public Security security { get; set; }
@@ -584,12 +616,11 @@ namespace BTCTC
         }
         public DateTime dateTime { get; set; }
     }
-
-    // In principle it doesn't make much sense to declare a class with just a single field,
-    // but with an eye on future extensions, it's good to keep this structure in place.
+    
     public class Security
     {
         public string name { get; set; }
+        public SecurityType type { get; set; }
     }
 
     public class Order

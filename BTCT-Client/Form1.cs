@@ -90,7 +90,7 @@ namespace BTCTC
                 return;
             }
     
-            textBox4.Text = "User: " + p.username + Environment.NewLine;
+            textBox4.Text += "User: " + p.username + Environment.NewLine;
             textBox4.Text += "Generated: " + p.lastUpdate.ToString() + Environment.NewLine;
             foreach (SecurityOwned so in p.securities)
             {
