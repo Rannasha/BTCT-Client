@@ -15,7 +15,7 @@ namespace BTCTC
 {
     public enum OrderType { OT_SELL, OT_BUY, OT_CALL, OT_PUT, OT_TIN, OT_TOUT, OT_UNKNOWN};
     public enum AuthStatusType { AS_NONE, AS_REQRCV, AS_OK };
-    public enum SecurityType { ST_BOND, ST_STOCK, ST_FUND };
+    public enum SecurityType { ST_BOND, ST_STOCK, ST_FUND, ST_UNKNOWN };
 
     public delegate void AuthStatusChangedFunc(AuthStatusType newAS);
 
@@ -85,15 +85,40 @@ namespace BTCTC
             {
                 return OrderType.OT_TOUT;
             }
-            if (s == "Call Option")
+            if (s == "Call Option" || s == "option-buy")
             {
                 return OrderType.OT_CALL;
             }
-            if (s == "Put Option")
+            if (s == "Put Option" || s == "option-sell")
             {
                 return OrderType.OT_PUT;
             }
             return OrderType.OT_UNKNOWN;
+        }
+
+        public static SecurityType StringToSecurityType(string s)
+        {
+            if (s == "BOND")
+            {
+                return SecurityType.ST_BOND;
+            }
+            if (s == "STOCK")
+            {
+                return SecurityType.ST_STOCK;
+            }
+            if (s == "FUND")
+            {
+                return SecurityType.ST_FUND;
+            }
+            return SecurityType.ST_UNKNOWN;
+        }
+
+        public static DateTime UnixTimeStampToDateTime(long t)
+        {
+            DateTime d = new DateTime(1970,1,1,0,0,0,0);
+            d = d.AddSeconds(t).ToLocalTime();
+
+            return d;
         }
     }
 
@@ -145,6 +170,7 @@ namespace BTCTC
         private string _consumerSecret;
         private const string _tradeUrl = "https://btct.co/oauth/trade";
         private const string _csvUrl = "https://btct.co/csv/";
+        private const string _openUrl = "https://btct.co/api/";
         private OAuthConsumer _oauthConsumer;
         private AuthStatusType _authStatus;
 
@@ -254,6 +280,7 @@ namespace BTCTC
             string st = (string)r["generated"];
             string[] formats = { "MM/dd/yyyy HH:mm:ss" };
             pf.lastUpdate = DateTime.ParseExact(st, formats, new CultureInfo("en-US"), DateTimeStyles.None);
+            pf.balance = BTCTUtils.StringToSatoshi((string)r["balance"]["BTC"]);
 
             // Parse list of currently held securities.
             List<SecurityOwned> SOList = new List<SecurityOwned>();
@@ -346,6 +373,147 @@ namespace BTCTC
             dh.lastUpdate = DateTime.Now;
 
             return dh;
+        }
+
+        private Ticker parseTicker(JToken j)
+        {
+            Ticker t = new Ticker();
+            string temp;
+
+            t.type = BTCTUtils.StringToSecurityType((string)j["type"]);
+            t.last = BTCTUtils.StringToSatoshi((string)j["last_price"]);
+            if ((string)j["last_qty"] != "")
+            {
+                t.lastQty = Convert.ToInt32((string)j["last_qty"]);
+            }
+            t.bid = BTCTUtils.StringToSatoshi((string)j["bid"]);
+            t.ask = BTCTUtils.StringToSatoshi((string)j["ask"]);
+            t.lo1d = BTCTUtils.StringToSatoshi((string)j["24h_low"]);
+            t.hi1d = BTCTUtils.StringToSatoshi((string)j["24h_high"]);
+            t.av1d = BTCTUtils.StringToSatoshi((string)j["24h_avg"]);
+            // Volume data comes in the form "quantity@BTCvolume"
+            temp = ((string)j["24h_vol"]);
+            if (temp == "--")
+            {
+                t.vol1d = 0;
+                t.volBTC1d = 0;
+            }
+            else
+            {
+                t.vol1d = Convert.ToInt32(temp.Split(new Char[] { '@' })[0]);
+                t.volBTC1d = BTCTUtils.StringToSatoshi(temp.Split(new Char[] { '@' })[1]);
+            }
+            t.lo7d = BTCTUtils.StringToSatoshi((string)j["7d_low"]);
+            t.hi7d = BTCTUtils.StringToSatoshi((string)j["7d_high"]);
+            t.av7d = BTCTUtils.StringToSatoshi((string)j["7d_avg"]);
+            temp = ((string)j["7d_vol"]);
+            if (temp == "--")
+            {
+                t.vol7d = 0;
+                t.volBTC7d = 0;
+            }
+            else
+            {
+                t.vol7d = Convert.ToInt32(temp.Split(new Char[] { '@' })[0]);
+                t.volBTC7d = BTCTUtils.StringToSatoshi(temp.Split(new Char[] { '@' })[1]);
+            }
+
+            t.lo30d = BTCTUtils.StringToSatoshi((string)j["30d_low"]);
+            t.hi30d = BTCTUtils.StringToSatoshi((string)j["30d_high"]);
+            t.av30d = BTCTUtils.StringToSatoshi((string)j["30d_avg"]);
+            temp = ((string)j["30d_vol"]);
+            if (temp == "--")
+            {
+                t.vol30d = 0;
+                t.volBTC30d = 0;
+            }
+            else
+            {
+                t.vol30d = Convert.ToInt32(temp.Split(new Char[] { '@' })[0]);
+                t.volBTC30d = BTCTUtils.StringToSatoshi(temp.Split(new Char[] { '@' })[1]);
+            }
+
+            t.totalVol = BTCTUtils.StringToSatoshi((string)j["total_vol"]);
+
+            return t;            
+        }
+
+        private List<Ticker> parseTickerList(string s)
+        {
+            List<Ticker> lt = new List<Ticker>();
+
+            JObject r;
+            try
+            {
+                r = JObject.Parse(s);
+            }
+            catch (Newtonsoft.Json.JsonReaderException ex)
+            {
+                throw (new BTCTException("Invalid response format."));
+            }
+            foreach (JProperty ch in r.Children())
+            {
+                Ticker t = new Ticker();
+
+                string tname = ch.Name;
+                JToken c = ch.First;
+
+                t = parseTicker(c);
+                t.name = tname;
+
+                lt.Add(t);
+            }
+
+            return lt;
+        }
+
+        private Ticker parseSingleTicker(string s)
+        {
+            JObject r;
+            try
+            {
+                r = JObject.Parse(s);
+            }
+            catch (Newtonsoft.Json.JsonReaderException ex)
+            {
+                throw (new BTCTException("Invalid response format."));
+            }
+
+            JToken j = (JToken)r;
+
+            Ticker t = parseTicker(j);
+            t.name = (string)j["ticker"];
+
+            return t;
+        }
+
+        private TradeHistory parsePublicTradeHistory(string s)
+        {
+            List<Order> OList = new List<Order>();
+            TradeHistory t = new TradeHistory();
+
+            JObject r;
+            try
+            {
+                r = JObject.Parse(s);
+            }
+            catch (Newtonsoft.Json.JsonReaderException ex)
+            {
+                throw (new BTCTException("Invalid response format."));
+            }
+            foreach (JProperty ch in r.Children())
+            {
+                Order o = new Order();
+                JToken c = ch.First;
+
+                o.active = false;
+                o.amount = Convert.ToInt32((string)c["quantity"]);
+                o.dateTime = BTCTUtils.UnixTimeStampToDateTime(Convert.ToInt32((string)c["timestamp"]));
+
+            }
+            // HERE!
+            t.lastUpdate = DateTime.Now;
+            return null;
         }
 
         private void parseSuccess(string json)
@@ -575,7 +743,16 @@ namespace BTCTC
 
         public List<Ticker> GetTickers()
         {
-            return null;
+            string s = rawHttpRequest(_openUrl + "ticker");
+
+            return parseTickerList(s);      
+        }
+
+        public TradeHistory GetPublicTradeHistory()
+        {
+            string s = rawHttpRequest(_openUrl + "tradeHistory");
+
+            return parsePublicTradeHistory(s);
         }
     }
 
@@ -584,6 +761,8 @@ namespace BTCTC
     {
         public long last { get; set; }
         public int lastQty { get; set; }
+        public long bid { get; set; }
+        public long ask { get; set; }
         public long lo1d { get; set; }
         public long hi1d { get; set; }
         public long av1d { get; set; }
@@ -599,7 +778,7 @@ namespace BTCTC
         public long av30d { get; set; }
         public int vol30d { get; set; }
         public long volBTC30d { get; set; }
-        public int totalVol { get; set; }
+        public long totalVol { get; set; }
     }
 
     public class Dividend

@@ -266,6 +266,89 @@ namespace BTCTC
             }
         }
 
+        private void getAllTickers()
+        {
+            List<Ticker> lt = b.GetTickers();
+
+            foreach (Ticker t in lt)
+            {
+                textBox4.Text += t.name + " -- " + t.lastQty.ToString() + "@" + t.last.ToString() + Environment.NewLine;
+            }
+        }
+
+        private void getTradeHistory()
+        {
+            TradeHistory t = null;
+
+            try
+            {
+                t = b.GetPublicTradeHistory();
+            }
+            catch (Exception ex)
+            {
+                textBox4.Text += "Error obtaining trade history: " + ex.Message + Environment.NewLine;
+                return;
+            }
+
+            for (int i = 0; i < t.orders.Count; i++)
+            {
+                textBox4.Text += "[" + t.orders[i].dateTime.ToString() + "] ";
+                switch (t.orders[i].orderType)
+                {
+                    case OrderType.OT_BUY:
+                        textBox4.Text += "buy ";
+                        break;
+                    case OrderType.OT_SELL:
+                        textBox4.Text += "sell ";
+                        break;
+                    case OrderType.OT_TIN:
+                        textBox4.Text += "tr-in ";
+                        break;
+                    case OrderType.OT_TOUT:
+                        textBox4.Text += "tr-out ";
+                        break;
+                    default:
+                        textBox4.Text += "unknown ";
+                        break;
+                }
+                textBox4.Text += t.orders[i].amount.ToString() + " x " + t.orders[i].security.name + " @ " + BTCTUtils.SatoshiToString(t.orders[i].price);
+                textBox4.Text += Environment.NewLine;
+            }
+        }
+
+        private void button9_Click_1(object sender, EventArgs e)
+        {
+    
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            Portfolio p; 
+            bool done = false;
+
+           b.SubmitOrder("DMS.SELLING", 111, 2500000, OrderType.OT_SELL, 0);
+          
+                    textBox4.Text += "Done...";
+          
+
+        }
+
+
+
+  /*          switch (cbGlobalDataSelect.SelectedIndex)
+            {
+                case 0:
+                    getAllTickers();
+                    break;
+                case 1:
+                    getTradeHistory();
+                    break;
+                case 2:
+            //        getDividendHistory();
+                    break;
+            }*/
+   
+            
 
     }
 }
