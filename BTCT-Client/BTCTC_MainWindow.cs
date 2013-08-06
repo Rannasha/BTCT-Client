@@ -14,13 +14,13 @@ using OAuth;
 
 namespace BTCTC
 {
-    public partial class Form1 : Form
+    public partial class BTCTC_MainWindow : Form
     {
         private const string _consumerKey = "20bd6751441ff12b98117f4be1c09a9371de4cf7";
         private const string _consumerSecret = "0949565dac0d493501a84cbab79a0f9eb6c936a9";
         private BTCTLink b;
 
-        public Form1()
+        public BTCTC_MainWindow()
         {
             InitializeComponent();
             cbOrderType.SelectedIndex = 0;
