@@ -45,7 +45,7 @@ namespace BTCTC
 
         private void DebugToTextBox(string msg)
         {
-            Log(msg + Environment.NewLine, false);
+          //  Log(msg + Environment.NewLine, false);
         }
 
         private void OnAuthStatusChanged(object sender, EventArgs e)
@@ -383,7 +383,12 @@ namespace BTCTC
             }
             catch (Exception ex)
             {
-                Log(tbOutput.Text += "Invalid number-format in interval-input" + Environment.NewLine, false);
+                Log("Invalid number-format in interval-input" + Environment.NewLine, false);
+                return;
+            }
+            if (interval < 2)
+            {
+                Log("Interval too short, needs to be at least 2 minutes" + Environment.NewLine, false);
                 return;
             }
 
@@ -407,8 +412,19 @@ namespace BTCTC
             btnAutoTransferStart.Enabled = false;
             btnAutoTransferStop.Enabled = true;
 
-            TradeHistory t = b.GetTradeHistory();
+            TradeHistory t;
 
+            try
+            {
+                t = b.GetTradeHistory();
+            }
+            catch (BTCTException ex)
+            {
+                Log("Error obtaining initial trade history - Timer aborted. Message: " + ex.Message, false);
+                btnAutoTransferStop_Click(sender, e);
+                return;
+            }
+            
             lastUpdate = t.orders[t.orders.Count - 1].dateTime;
         }
 
@@ -434,7 +450,16 @@ namespace BTCTC
             
             Log("Update started at " + DateTime.Now.ToString() + Environment.NewLine, true);
 
-            TradeHistory t = b.GetTradeHistory();
+            TradeHistory t;
+            try
+            {
+                t = b.GetTradeHistory();
+            }
+            catch (BTCTException ex)
+            {
+                Log("Error obtaining trade history. Message: " + ex.Message, true);
+                return;
+            }
 
             foreach (Order o in t.orders)
             {
