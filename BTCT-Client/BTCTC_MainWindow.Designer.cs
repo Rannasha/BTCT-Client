@@ -62,19 +62,9 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.button9 = new System.Windows.Forms.Button();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.lbInterval = new System.Windows.Forms.Label();
-            this.btnAutoTransferStart = new System.Windows.Forms.Button();
-            this.tbInterval = new System.Windows.Forms.TextBox();
-            this.cbReadOnly = new System.Windows.Forms.CheckBox();
-            this.btnAutoTransferStop = new System.Windows.Forms.Button();
-            this.tbSingleUserName = new System.Windows.Forms.TextBox();
-            this.lbSingleUserName = new System.Windows.Forms.Label();
-            this.cbSingleUser = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -433,113 +423,11 @@
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click_1);
             // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.cbSingleUser);
-            this.groupBox4.Controls.Add(this.lbSingleUserName);
-            this.groupBox4.Controls.Add(this.tbSingleUserName);
-            this.groupBox4.Controls.Add(this.btnAutoTransferStop);
-            this.groupBox4.Controls.Add(this.cbReadOnly);
-            this.groupBox4.Controls.Add(this.tbInterval);
-            this.groupBox4.Controls.Add(this.lbInterval);
-            this.groupBox4.Controls.Add(this.btnAutoTransferStart);
-            this.groupBox4.Location = new System.Drawing.Point(712, 88);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(210, 136);
-            this.groupBox4.TabIndex = 37;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "DMS Auto-Transfer";
-            // 
-            // lbInterval
-            // 
-            this.lbInterval.AutoSize = true;
-            this.lbInterval.Location = new System.Drawing.Point(4, 20);
-            this.lbInterval.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lbInterval.Name = "lbInterval";
-            this.lbInterval.Size = new System.Drawing.Size(67, 13);
-            this.lbInterval.TabIndex = 32;
-            this.lbInterval.Text = "Interval (min)";
-            // 
-            // btnAutoTransferStart
-            // 
-            this.btnAutoTransferStart.Location = new System.Drawing.Point(8, 108);
-            this.btnAutoTransferStart.Name = "btnAutoTransferStart";
-            this.btnAutoTransferStart.Size = new System.Drawing.Size(75, 23);
-            this.btnAutoTransferStart.TabIndex = 36;
-            this.btnAutoTransferStart.Text = "Start";
-            this.btnAutoTransferStart.UseVisualStyleBackColor = true;
-            this.btnAutoTransferStart.Click += new System.EventHandler(this.btnAutoTransferStart_Click);
-            // 
-            // tbInterval
-            // 
-            this.tbInterval.Location = new System.Drawing.Point(76, 16);
-            this.tbInterval.Margin = new System.Windows.Forms.Padding(2);
-            this.tbInterval.Name = "tbInterval";
-            this.tbInterval.Size = new System.Drawing.Size(127, 20);
-            this.tbInterval.TabIndex = 32;
-            // 
-            // cbReadOnly
-            // 
-            this.cbReadOnly.AutoSize = true;
-            this.cbReadOnly.Checked = true;
-            this.cbReadOnly.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbReadOnly.Location = new System.Drawing.Point(8, 40);
-            this.cbReadOnly.Name = "cbReadOnly";
-            this.cbReadOnly.Size = new System.Drawing.Size(184, 17);
-            this.cbReadOnly.TabIndex = 37;
-            this.cbReadOnly.Text = "Don\'t perform transfers (read-only)";
-            this.cbReadOnly.UseVisualStyleBackColor = true;
-            this.cbReadOnly.CheckedChanged += new System.EventHandler(this.cbReadOnly_CheckedChanged);
-            // 
-            // btnAutoTransferStop
-            // 
-            this.btnAutoTransferStop.Enabled = false;
-            this.btnAutoTransferStop.Location = new System.Drawing.Point(88, 108);
-            this.btnAutoTransferStop.Name = "btnAutoTransferStop";
-            this.btnAutoTransferStop.Size = new System.Drawing.Size(75, 23);
-            this.btnAutoTransferStop.TabIndex = 38;
-            this.btnAutoTransferStop.Text = "Stop";
-            this.btnAutoTransferStop.UseVisualStyleBackColor = true;
-            this.btnAutoTransferStop.Click += new System.EventHandler(this.btnAutoTransferStop_Click);
-            // 
-            // tbSingleUserName
-            // 
-            this.tbSingleUserName.Enabled = false;
-            this.tbSingleUserName.Location = new System.Drawing.Point(76, 84);
-            this.tbSingleUserName.Margin = new System.Windows.Forms.Padding(2);
-            this.tbSingleUserName.Name = "tbSingleUserName";
-            this.tbSingleUserName.Size = new System.Drawing.Size(127, 20);
-            this.tbSingleUserName.TabIndex = 39;
-            // 
-            // lbSingleUserName
-            // 
-            this.lbSingleUserName.AutoSize = true;
-            this.lbSingleUserName.Enabled = false;
-            this.lbSingleUserName.Location = new System.Drawing.Point(16, 88);
-            this.lbSingleUserName.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lbSingleUserName.Name = "lbSingleUserName";
-            this.lbSingleUserName.Size = new System.Drawing.Size(55, 13);
-            this.lbSingleUserName.TabIndex = 40;
-            this.lbSingleUserName.Text = "Username";
-            // 
-            // cbSingleUser
-            // 
-            this.cbSingleUser.AutoSize = true;
-            this.cbSingleUser.Enabled = false;
-            this.cbSingleUser.Location = new System.Drawing.Point(8, 64);
-            this.cbSingleUser.Name = "cbSingleUser";
-            this.cbSingleUser.Size = new System.Drawing.Size(161, 17);
-            this.cbSingleUser.TabIndex = 41;
-            this.cbSingleUser.Text = "Transfer only to specific user";
-            this.cbSingleUser.UseVisualStyleBackColor = true;
-            this.cbSingleUser.CheckedChanged += new System.EventHandler(this.cbSingleUser_CheckedChanged);
-            // 
             // BTCTC_MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(929, 439);
-            this.Controls.Add(this.groupBox4);
+            this.ClientSize = new System.Drawing.Size(711, 439);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.groupBox2);
@@ -565,8 +453,6 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -608,15 +494,6 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.CheckBox cbReadOnly;
-        private System.Windows.Forms.TextBox tbInterval;
-        private System.Windows.Forms.Label lbInterval;
-        private System.Windows.Forms.Button btnAutoTransferStart;
-        private System.Windows.Forms.CheckBox cbSingleUser;
-        private System.Windows.Forms.Label lbSingleUserName;
-        private System.Windows.Forms.TextBox tbSingleUserName;
-        private System.Windows.Forms.Button btnAutoTransferStop;
     }
 }
 
