@@ -33,7 +33,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
-            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.tbOutput = new System.Windows.Forms.TextBox();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
@@ -62,10 +62,19 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.button9 = new System.Windows.Forms.Button();
-            this.button10 = new System.Windows.Forms.Button();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.lbInterval = new System.Windows.Forms.Label();
+            this.btnAutoTransferStart = new System.Windows.Forms.Button();
+            this.tbInterval = new System.Windows.Forms.TextBox();
+            this.cbReadOnly = new System.Windows.Forms.CheckBox();
+            this.btnAutoTransferStop = new System.Windows.Forms.Button();
+            this.tbSingleUserName = new System.Windows.Forms.TextBox();
+            this.lbSingleUserName = new System.Windows.Forms.Label();
+            this.cbSingleUser = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -114,15 +123,15 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
-            // textBox4
+            // tbOutput
             // 
-            this.textBox4.Location = new System.Drawing.Point(8, 60);
-            this.textBox4.Multiline = true;
-            this.textBox4.Name = "textBox4";
-            this.textBox4.ReadOnly = true;
-            this.textBox4.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox4.Size = new System.Drawing.Size(476, 350);
-            this.textBox4.TabIndex = 9;
+            this.tbOutput.Location = new System.Drawing.Point(8, 60);
+            this.tbOutput.Multiline = true;
+            this.tbOutput.Name = "tbOutput";
+            this.tbOutput.ReadOnly = true;
+            this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.tbOutput.Size = new System.Drawing.Size(476, 350);
+            this.tbOutput.TabIndex = 9;
             // 
             // button4
             // 
@@ -370,7 +379,7 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(572, 28);
+            this.button6.Location = new System.Drawing.Point(572, 3);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(75, 23);
             this.button6.TabIndex = 33;
@@ -402,7 +411,7 @@
             this.groupBox3.Size = new System.Drawing.Size(210, 72);
             this.groupBox3.TabIndex = 35;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Global data";
+            this.groupBox3.Text = "Global data (NYI)";
             // 
             // label10
             // 
@@ -424,22 +433,113 @@
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click_1);
             // 
-            // button10
+            // groupBox4
             // 
-            this.button10.Location = new System.Drawing.Point(628, 56);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(75, 23);
-            this.button10.TabIndex = 36;
-            this.button10.Text = "button10";
-            this.button10.UseVisualStyleBackColor = true;
-            this.button10.Click += new System.EventHandler(this.button10_Click);
+            this.groupBox4.Controls.Add(this.cbSingleUser);
+            this.groupBox4.Controls.Add(this.lbSingleUserName);
+            this.groupBox4.Controls.Add(this.tbSingleUserName);
+            this.groupBox4.Controls.Add(this.btnAutoTransferStop);
+            this.groupBox4.Controls.Add(this.cbReadOnly);
+            this.groupBox4.Controls.Add(this.tbInterval);
+            this.groupBox4.Controls.Add(this.lbInterval);
+            this.groupBox4.Controls.Add(this.btnAutoTransferStart);
+            this.groupBox4.Location = new System.Drawing.Point(712, 88);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(210, 136);
+            this.groupBox4.TabIndex = 37;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "DMS Auto-Transfer";
+            // 
+            // lbInterval
+            // 
+            this.lbInterval.AutoSize = true;
+            this.lbInterval.Location = new System.Drawing.Point(4, 20);
+            this.lbInterval.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lbInterval.Name = "lbInterval";
+            this.lbInterval.Size = new System.Drawing.Size(67, 13);
+            this.lbInterval.TabIndex = 32;
+            this.lbInterval.Text = "Interval (min)";
+            // 
+            // btnAutoTransferStart
+            // 
+            this.btnAutoTransferStart.Location = new System.Drawing.Point(8, 108);
+            this.btnAutoTransferStart.Name = "btnAutoTransferStart";
+            this.btnAutoTransferStart.Size = new System.Drawing.Size(75, 23);
+            this.btnAutoTransferStart.TabIndex = 36;
+            this.btnAutoTransferStart.Text = "Start";
+            this.btnAutoTransferStart.UseVisualStyleBackColor = true;
+            this.btnAutoTransferStart.Click += new System.EventHandler(this.btnAutoTransferStart_Click);
+            // 
+            // tbInterval
+            // 
+            this.tbInterval.Location = new System.Drawing.Point(76, 16);
+            this.tbInterval.Margin = new System.Windows.Forms.Padding(2);
+            this.tbInterval.Name = "tbInterval";
+            this.tbInterval.Size = new System.Drawing.Size(127, 20);
+            this.tbInterval.TabIndex = 32;
+            // 
+            // cbReadOnly
+            // 
+            this.cbReadOnly.AutoSize = true;
+            this.cbReadOnly.Checked = true;
+            this.cbReadOnly.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbReadOnly.Location = new System.Drawing.Point(8, 40);
+            this.cbReadOnly.Name = "cbReadOnly";
+            this.cbReadOnly.Size = new System.Drawing.Size(184, 17);
+            this.cbReadOnly.TabIndex = 37;
+            this.cbReadOnly.Text = "Don\'t perform transfers (read-only)";
+            this.cbReadOnly.UseVisualStyleBackColor = true;
+            this.cbReadOnly.CheckedChanged += new System.EventHandler(this.cbReadOnly_CheckedChanged);
+            // 
+            // btnAutoTransferStop
+            // 
+            this.btnAutoTransferStop.Enabled = false;
+            this.btnAutoTransferStop.Location = new System.Drawing.Point(88, 108);
+            this.btnAutoTransferStop.Name = "btnAutoTransferStop";
+            this.btnAutoTransferStop.Size = new System.Drawing.Size(75, 23);
+            this.btnAutoTransferStop.TabIndex = 38;
+            this.btnAutoTransferStop.Text = "Stop";
+            this.btnAutoTransferStop.UseVisualStyleBackColor = true;
+            this.btnAutoTransferStop.Click += new System.EventHandler(this.btnAutoTransferStop_Click);
+            // 
+            // tbSingleUserName
+            // 
+            this.tbSingleUserName.Enabled = false;
+            this.tbSingleUserName.Location = new System.Drawing.Point(76, 84);
+            this.tbSingleUserName.Margin = new System.Windows.Forms.Padding(2);
+            this.tbSingleUserName.Name = "tbSingleUserName";
+            this.tbSingleUserName.Size = new System.Drawing.Size(127, 20);
+            this.tbSingleUserName.TabIndex = 39;
+            // 
+            // lbSingleUserName
+            // 
+            this.lbSingleUserName.AutoSize = true;
+            this.lbSingleUserName.Enabled = false;
+            this.lbSingleUserName.Location = new System.Drawing.Point(16, 88);
+            this.lbSingleUserName.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lbSingleUserName.Name = "lbSingleUserName";
+            this.lbSingleUserName.Size = new System.Drawing.Size(55, 13);
+            this.lbSingleUserName.TabIndex = 40;
+            this.lbSingleUserName.Text = "Username";
+            // 
+            // cbSingleUser
+            // 
+            this.cbSingleUser.AutoSize = true;
+            this.cbSingleUser.Enabled = false;
+            this.cbSingleUser.Location = new System.Drawing.Point(8, 64);
+            this.cbSingleUser.Name = "cbSingleUser";
+            this.cbSingleUser.Size = new System.Drawing.Size(161, 17);
+            this.cbSingleUser.TabIndex = 41;
+            this.cbSingleUser.Text = "Transfer only to specific user";
+            this.cbSingleUser.UseVisualStyleBackColor = true;
+            this.cbSingleUser.CheckedChanged += new System.EventHandler(this.cbSingleUser_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(709, 439);
-            this.Controls.Add(this.button10);
+            this.ClientSize = new System.Drawing.Size(929, 439);
+            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.groupBox2);
@@ -451,7 +551,7 @@
             this.Controls.Add(this.button7);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
-            this.Controls.Add(this.textBox4);
+            this.Controls.Add(this.tbOutput);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.button2);
@@ -465,6 +565,8 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -477,7 +579,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.TextBox tbOutput;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button7;
@@ -506,7 +608,15 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.CheckBox cbReadOnly;
+        private System.Windows.Forms.TextBox tbInterval;
+        private System.Windows.Forms.Label lbInterval;
+        private System.Windows.Forms.Button btnAutoTransferStart;
+        private System.Windows.Forms.CheckBox cbSingleUser;
+        private System.Windows.Forms.Label lbSingleUserName;
+        private System.Windows.Forms.TextBox tbSingleUserName;
+        private System.Windows.Forms.Button btnAutoTransferStop;
     }
 }
 
