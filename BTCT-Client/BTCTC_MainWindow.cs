@@ -481,7 +481,7 @@ namespace BTCTC
                                     b.TransferAsset(s, num, username, 0);
                                 }
                             }
-                            if (readOnly || (singleUser && singleUserName == username))
+                            if (readOnly || (singleUser && singleUserName != username))
                             {
                                 Log("(not executed) ", true);
                             }
