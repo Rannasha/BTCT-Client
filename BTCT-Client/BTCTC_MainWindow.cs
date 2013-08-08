@@ -418,10 +418,12 @@ namespace BTCTC
             {
                 t = b.GetTradeHistory();
                 lastUpdate = t.orders[t.orders.Count - 1].dateTime;
+                Log("Starting auto-transfer at " + DateTime.Now.ToString() + Environment.NewLine
+                    + "Most recent entry in trade history at " + lastUpdate.ToString() + " (server time)" + Environment.NewLine, true);
             }
             catch (BTCTException ex)
             {
-                Log("Error obtaining initial trade history - Timer aborted. Message: " + ex.Message, false);
+                Log("Error obtaining initial trade history - Timer aborted. Message: " + ex.Message, true);
                 btnAutoTransferStop_Click(sender, e);
                 return;
             }
@@ -448,9 +450,7 @@ namespace BTCTC
             string[] output = { "DMS.MINING", "DMS.SELLING" };
             
             Log("Update started at " + DateTime.Now.ToString() + Environment.NewLine, true);
-
-
-
+            
             TradeHistory t;
             try
             {
@@ -459,6 +459,12 @@ namespace BTCTC
             catch (BTCTException ex)
             {
                 Log("Error obtaining trade history. Message: " + ex.Message + Environment.NewLine, true);
+                return;
+            }
+            if (lastUpdate.CompareTo(t.orders[t.orders.Count - 1].dateTime) > 0)
+            {
+                Log("ERROR: Newest order in latest update older than in previous update. Aborting auto-transfer.", true);
+                btnAutoTransferStop_Click(this, e);
                 return;
             }
             foreach (Order o in t.orders)
@@ -494,8 +500,10 @@ namespace BTCTC
                     }
                 }
             }
-            lastUpdate = t.orders[t.orders.Count - 1].dateTime;
 
+            lastUpdate = t.orders[t.orders.Count - 1].dateTime;
+            Log("Update completed at " + DateTime.Now.ToString() + Environment.NewLine, true);
+            Log("Most recent trade was at " + t.orders[t.orders.Count - 1].dateTime.ToString() + " (server time)" + Environment.NewLine, true);
         }
         #endregion
 
