@@ -347,8 +347,8 @@ namespace BTCTC
 
         #region DMS Auto-Transfer functions
         System.Timers.Timer updateTimer;
-        int interval;
-        bool readOnly, singleUser;
+        int interval, maxQuantity;
+        bool readOnly, singleUser, qtyLimit;
         string singleUserName;
         DateTime lastUpdate;
 
@@ -356,10 +356,15 @@ namespace BTCTC
         {
             bool ro = cbReadOnly.Checked;
             bool su = cbSingleUser.Checked;
+            bool mq = cbMaxQuantity.Checked;
 
             cbSingleUser.Enabled = !ro;
             tbSingleUserName.Enabled = !ro && su;
             lbSingleUserName.Enabled = !ro && su;
+
+            cbMaxQuantity.Enabled = !ro;
+            tbMaxQuantity.Enabled = !ro && mq;
+            lbMaxQuantity.Enabled = !ro && mq;
         }
 
         private void cbSingleUser_CheckedChanged(object sender, EventArgs e)
@@ -368,6 +373,14 @@ namespace BTCTC
 
             tbSingleUserName.Enabled = su;
             lbSingleUserName.Enabled = su;
+        }
+
+        private void cbMaxQuantity_CheckedChanged(object sender, EventArgs e)
+        {
+            bool mq = cbMaxQuantity.Checked;
+
+            tbMaxQuantity.Enabled = mq;
+            lbMaxQuantity.Enabled = mq;
         }
 
         private void btnAutoTransferStart_Click(object sender, EventArgs e)
@@ -379,7 +392,7 @@ namespace BTCTC
             }
             try
             {
-                interval = Convert.ToInt32(tbInterval.Text) * 1000 *60;
+                interval = Convert.ToInt32(tbInterval.Text) * 1000 * 60;
             }
             catch (Exception ex)
             {
@@ -401,6 +414,19 @@ namespace BTCTC
             singleUser = cbSingleUser.Checked;
             if (singleUser)
                 singleUserName = tbSingleUserName.Text;
+            qtyLimit = cbMaxQuantity.Checked;
+            if (qtyLimit)
+            {
+                try
+                {
+                    maxQuantity = Convert.ToInt32(tbMaxQuantity.Text);
+                }
+                catch (Exception ex)
+                {
+                    Log("Invalid number-format for max. quantity" + Environment.NewLine, false);
+                    return;
+                }
+            }
 
             lbInterval.Enabled = false;
             tbInterval.Enabled = false;
@@ -408,6 +434,9 @@ namespace BTCTC
             cbSingleUser.Enabled = false;
             lbSingleUserName.Enabled = false;
             tbSingleUserName.Enabled = false;
+            lbMaxQuantity.Enabled = false;
+            cbMaxQuantity.Enabled = false;
+            tbMaxQuantity.Enabled = false;
 
             btnAutoTransferStart.Enabled = false;
             btnAutoTransferStop.Enabled = true;
@@ -439,6 +468,10 @@ namespace BTCTC
             cbSingleUser.Enabled = !readOnly;
             lbSingleUserName.Enabled = !readOnly && singleUser;
             tbSingleUserName.Enabled = !readOnly && singleUser;
+            
+            cbMaxQuantity.Enabled = !readOnly;
+            tbMaxQuantity.Enabled = !readOnly && qtyLimit;
+            lbMaxQuantity.Enabled = !readOnly && qtyLimit;
 
             btnAutoTransferStart.Enabled = true;
             btnAutoTransferStop.Enabled = false;
@@ -482,12 +515,12 @@ namespace BTCTC
                         {
                             if (!readOnly)
                             {
-                                if (!singleUser || singleUserName == username)
+                                if ( (!singleUser || singleUserName == username) && (!qtyLimit || num <= maxQuantity) )
                                 {
                                     b.TransferAsset(s, num, username, 0);
                                 }
                             }
-                            if (readOnly || (singleUser && singleUserName != username))
+                            if (readOnly || (singleUser && singleUserName != username) || (qtyLimit && num > maxQuantity))
                             {
                                 Log("(not executed) ", true);
                             }
@@ -506,9 +539,5 @@ namespace BTCTC
             Log("Most recent trade was at " + t.orders[t.orders.Count - 1].dateTime.ToString() + " (server time)" + Environment.NewLine, true);
         }
         #endregion
-
-
-
-
     }
 }
