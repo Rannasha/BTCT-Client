@@ -40,7 +40,7 @@ namespace BTCTC
                 }
             }
 
-            tbOutput.Text += s;
+            tbOutput.AppendText(s);
         }
 
         private void DebugToTextBox(string msg)
