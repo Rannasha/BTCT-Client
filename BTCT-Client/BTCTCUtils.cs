@@ -266,10 +266,9 @@ namespace BTCTC
                 using (System.Net.HttpWebResponse response = request.GetResponse() as System.Net.HttpWebResponse)
                 {
                     System.IO.StreamReader reader = new System.IO.StreamReader(response.GetResponseStream());
-                    while (reader.Peek() > 0)
-                    {
-                        c += reader.ReadLine() + Environment.NewLine;
-                    }
+
+                    // BTCT runs on a Unix/Linux system. Need to insert a "proper" Windows linebreak.
+                    c = (reader.ReadToEnd()).Replace("\n",Environment.NewLine);
                 }
             }
             catch (Exception ex)
@@ -280,7 +279,7 @@ namespace BTCTC
             {
                 GC.Collect();
             }
-            if (c == "Request rate limit exceeded, come back in 60 seconds.\r\n")
+            if (c.Contains("Request rate limit exceeded, come back in 60 seconds."))
             {
                 BTCTException tantrum = new BTCTException("Request Error. Message: " + c);
 

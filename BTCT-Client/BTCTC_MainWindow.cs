@@ -45,7 +45,7 @@ namespace BTCTC
 
         private void DebugToTextBox(string msg)
         {
-          //  Log(msg + Environment.NewLine, false);
+   //         Log(msg + Environment.NewLine, true);
         }
 
         private void OnAuthStatusChanged(object sender, EventArgs e)
@@ -401,7 +401,7 @@ namespace BTCTC
             singleUser = cbSingleUser.Checked;
             if (singleUser)
                 singleUserName = tbSingleUserName.Text;
-            
+
             lbInterval.Enabled = false;
             tbInterval.Enabled = false;
             cbReadOnly.Enabled = false;
@@ -417,6 +417,7 @@ namespace BTCTC
             try
             {
                 t = b.GetTradeHistory();
+                lastUpdate = t.orders[t.orders.Count - 1].dateTime;
             }
             catch (BTCTException ex)
             {
@@ -424,9 +425,7 @@ namespace BTCTC
                 btnAutoTransferStop_Click(sender, e);
                 return;
             }
-            
-            lastUpdate = t.orders[t.orders.Count - 1].dateTime;
-        }
+        } 
 
         private void btnAutoTransferStop_Click(object sender, EventArgs e)
         {
@@ -462,7 +461,7 @@ namespace BTCTC
                 Log("Error obtaining trade history. Message: " + ex.Message + Environment.NewLine, true);
                 return;
             }
-
+            Log("# of orders: " + t.orders.Count.ToString(),false);
             foreach (Order o in t.orders)
             {
                 if (o.dateTime.CompareTo(lastUpdate) > 0
