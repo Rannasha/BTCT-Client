@@ -296,7 +296,7 @@ namespace BTCTC
 
             foreach (Ticker t in lt)
             {
-                Log(t.name + " -- " + t.lastQty.ToString() + "@" + t.last.ToString() + Environment.NewLine, false);
+                Log(t.name + " -- " + t.lastQty.ToString() + "@" + BTCTUtils.SatoshiToString(t.last) + Environment.NewLine, false);
             }
         }
 
@@ -342,7 +342,18 @@ namespace BTCTC
 
         private void button9_Click_1(object sender, EventArgs e)
         {
-
+            switch (cbGlobalDataSelect.SelectedIndex)
+            {
+                case 2:
+                  //  getDividendHistory();
+                    break;
+                case 1:
+                    getTradeHistory();
+                    break;
+                case 0:
+                    getAllTickers();
+                    break;
+            }
         }
         
     }
