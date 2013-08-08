@@ -461,7 +461,6 @@ namespace BTCTC
                 Log("Error obtaining trade history. Message: " + ex.Message + Environment.NewLine, true);
                 return;
             }
-            Log("# of orders: " + t.orders.Count.ToString(),false);
             foreach (Order o in t.orders)
             {
                 if (o.dateTime.CompareTo(lastUpdate) > 0
