@@ -214,11 +214,14 @@ namespace BTCTC
     {
         private string _consumerKey;
         private string _consumerSecret;
-        private const string _tradeUrl = "https://btct.co/oauth/trade";
-        private const string _csvUrl = "https://btct.co/csv/";
-        private const string _openUrl = "https://btct.co/api/";
+        private string _tradeUrl ="oauth/trade";
+        private string _csvUrl = "csv/";
+        private string _openUrl = "api/";
+        private string _baseUrl;
         private OAuthConsumer _oauthConsumer;
         private AuthStatusType _authStatus;
+        private bool _isBTCT;
+        private string _coin;
 
         public DebugHandler DebugHandler { get; set; }
 
@@ -239,6 +242,14 @@ namespace BTCTC
             set
             {
                 _oauthConsumer.OauthConfig.ApiKey = value;
+            }
+        }
+
+        public bool isBTCT
+        {
+            get
+            {
+                return _isBTCT;
             }
         }
 
@@ -270,7 +281,7 @@ namespace BTCTC
 
             try
             {
-                response = (string)_oauthConsumer.request(_tradeUrl, "POST", p, "PLAIN");
+                response = (string)_oauthConsumer.request(_baseUrl + _tradeUrl, "POST", p, "PLAIN");
             }
             catch (Exception e)
             {
@@ -300,23 +311,28 @@ namespace BTCTC
         private string rawHttpRequest(string uri)
         {
             string c = String.Empty;
-            
+
             try
             {
                 System.Net.HttpWebRequest request = System.Net.HttpWebRequest.Create(uri) as System.Net.HttpWebRequest;
                 request.ProtocolVersion = HttpVersion.Version10;
-                System.Net.HttpWebResponse response = request.GetResponse() as System.Net.HttpWebResponse;
-                System.IO.StreamReader reader = new System.IO.StreamReader(response.GetResponseStream());
-                while (reader.Peek() > 0)
+                using (System.Net.HttpWebResponse response = request.GetResponse() as System.Net.HttpWebResponse)
                 {
-                    c += reader.ReadLine() + Environment.NewLine;
+                    System.IO.StreamReader reader = new System.IO.StreamReader(response.GetResponseStream());
+
+                    // BTCT runs on a Unix/Linux system. Need to insert a "proper" Windows linebreak.
+                    c = (reader.ReadToEnd()).Replace("\n",Environment.NewLine);
                 }
             }
             catch (Exception ex)
             {
                 throw (new BTCTException("Network Error. Message: " + ex.Message));
             }
-            if (c == "Request rate limit exceeded, come back in 60 seconds.\r\n")
+            finally
+            {
+                GC.Collect();
+            }
+            if (c.Contains("Request rate limit exceeded, come back in 60 seconds."))
             {
                 BTCTException tantrum = new BTCTException("Request Error. Message: " + c);
 
@@ -337,7 +353,7 @@ namespace BTCTC
             string st = (string)r["generated"];
             string[] formats = { "MM/dd/yyyy HH:mm:ss" };
             pf.lastUpdate = DateTime.ParseExact(st, formats, new CultureInfo("en-US"), DateTimeStyles.None);
-            pf.balance = BTCTUtils.StringToSatoshi((string)r["balance"]["BTC"]);
+            pf.balance = BTCTUtils.StringToSatoshi((string)r["balance"][_coin]);
             pf.apiKey = (string)r["api_key"];
 
             // Parse list of currently held securities.
@@ -632,7 +648,8 @@ namespace BTCTC
         }
         #endregion
 
-        public BTCTLink(string consumerKey, string consumerSecret, DebugHandler dh)
+        #region Constructors
+        public BTCTLink(string consumerKey, string consumerSecret, bool isBTCT, DebugHandler dh)
         {
             OAuthConfig oc;
 
@@ -649,17 +666,36 @@ namespace BTCTC
             oc.OauthScope = "all";
             oc.ConsumerKey = _consumerKey;
             oc.ConsumerSecret = _consumerSecret;
-            oc.RequestTokenUrl = "https://btct.co/oauth/request_token";
-            oc.AccessTokenUrl = "https://btct.co/oauth/access_token";
-            oc.UserAuthorizationUrl = "https://btct.co/authorize";
+            if (isBTCT)
+            {
+                _baseUrl = "https://btct.co/";
+                _coin = "BTC";
+            }
+            else
+            {
+                _baseUrl = "https://www.litecoinglobal.com/";
+                _coin = "LTC";
+            }
+            oc.RequestTokenUrl = _baseUrl + "oauth/request_token";
+            oc.AccessTokenUrl = _baseUrl + "oauth/access_token";
+            oc.UserAuthorizationUrl = _baseUrl + "authorize";
 
             _oauthConsumer = new OAuthConsumer(oc, "");
             _authStatus = AuthStatusType.AS_NONE;
         }
         public BTCTLink(string consumerKey, string consumerSecret) :
-            this (consumerKey, consumerSecret, null)
+            this (consumerKey, consumerSecret, true, null)
         {
         }
+        public BTCTLink(string consumerKey, string consumerSecret, bool isBTCT) :
+            this(consumerKey, consumerSecret, isBTCT, null)
+        {
+        }
+        public BTCTLink(string consumerKey, string consumerSecret, DebugHandler dh) :
+            this(consumerKey, consumerSecret, true, dh)
+        {
+        }
+        #endregion
 
         #region Access / token management
         public void SerializeConfig(string filename)
@@ -782,7 +818,7 @@ namespace BTCTC
         }
         public TradeHistory GetTradeHistory(string apikey)
         {
-            string s = rawHttpRequest(_csvUrl + "trades?key=" + apikey);
+            string s = rawHttpRequest(_baseUrl + _csvUrl + "trades?key=" + apikey);
             if (s.Contains("api key"))
             {
                 throw (new BTCTAuthException("Invalid api key."));
@@ -851,7 +887,7 @@ namespace BTCTC
         }
         public DividendHistory GetDividendHistory(string apikey)
         {
-            string s = rawHttpRequest(_csvUrl + "dividends?key=" + apikey);
+            string s = rawHttpRequest(_baseUrl + _csvUrl + "dividends?key=" + apikey);
             if (s.Contains("api key"))
             {
                 throw (new BTCTAuthException("Invalid api key."));
@@ -863,14 +899,14 @@ namespace BTCTC
 
         public List<Ticker> GetTickers()
         {
-            string s = rawHttpRequest(_openUrl + "ticker");
+            string s = rawHttpRequest(_baseUrl + _openUrl + "ticker");
 
             return parseTickerList(s);      
         }
 
         public TradeHistory GetPublicTradeHistory()
         {
-            string s = rawHttpRequest(_openUrl + "tradeHistory");
+            string s = rawHttpRequest(_baseUrl + _openUrl + "tradeHistory");
 
             return parsePublicTradeHistory(s);
         }
