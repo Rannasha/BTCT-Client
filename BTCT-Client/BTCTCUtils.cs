@@ -1,4 +1,39 @@
-﻿using System;
+﻿/* BTCT API Features
+*
+* Implementation status:
+* - Not yet implemented
+* x Partially implemented
+* X Fully implemented
+*
+* OPEN / JSON
+* X All assets & market data
+* - Ticker specific asset
+* - Order book specific asset
+* - Contract data asset
+* X All trades last 48h
+* - Trade history specific asset
+* - All dividends last 48h
+* - All dividends specific asset
+*
+* API-KEY / JSON
+* - Personal portfolio, optional history-feature
+*
+* API-KEY / CSV
+* - Personal portfolio
+* X Trade history
+* X Dividend history
+* - Deposit history
+* - Withdrawal history
+*
+* OAUTH / JSON
+* X Personal portfolio
+* X Transfer asset
+* - Transfer coins
+* X Submit ask
+* X Submit bid
+* X Cancel order
+*/
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,6 +68,13 @@ namespace BTCTC
     public class BTCTUtils
     {
         public const double SatoshiPerBTC = 100000000.0;
+
+        public static string ParseTickerString(string s)
+        {
+            if (s == "--" || s == "" || s == null)
+                return "0";
+            return s;
+        }
 
         public static long DoubleToSatoshi(double t)
         {
@@ -419,16 +461,14 @@ namespace BTCTC
             string temp;
 
             t.type = BTCTUtils.StringToSecurityType((string)j["type"]);
-            t.last = BTCTUtils.StringToSatoshi((string)j["last_price"]);
-            if ((string)j["last_qty"] != "")
-            {
-                t.lastQty = Convert.ToInt32((string)j["last_qty"]);
-            }
-            t.bid = BTCTUtils.StringToSatoshi((string)j["bid"]);
-            t.ask = BTCTUtils.StringToSatoshi((string)j["ask"]);
-            t.lo1d = BTCTUtils.StringToSatoshi((string)j["24h_low"]);
-            t.hi1d = BTCTUtils.StringToSatoshi((string)j["24h_high"]);
-            t.av1d = BTCTUtils.StringToSatoshi((string)j["24h_avg"]);
+            t.last = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["last_price"]));
+            t.lastQty = Convert.ToInt32(BTCTUtils.ParseTickerString((string)j["last_qty"]));
+
+            t.bid = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["bid"]));
+            t.ask = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["ask"]));
+            t.lo1d = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["24h_low"]));
+            t.hi1d = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["24h_high"]));
+            t.av1d = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["24h_avg"]));
             // Volume data comes in the form "quantity@BTCvolume"
             temp = ((string)j["24h_vol"]);
             if (temp == "--")
@@ -441,9 +481,9 @@ namespace BTCTC
                 t.vol1d = Convert.ToInt32(temp.Split(new Char[] { '@' })[0]);
                 t.volBTC1d = BTCTUtils.StringToSatoshi(temp.Split(new Char[] { '@' })[1]);
             }
-            t.lo7d = BTCTUtils.StringToSatoshi((string)j["7d_low"]);
-            t.hi7d = BTCTUtils.StringToSatoshi((string)j["7d_high"]);
-            t.av7d = BTCTUtils.StringToSatoshi((string)j["7d_avg"]);
+            t.lo7d = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["7d_low"]));
+            t.hi7d = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["7d_high"]));
+            t.av7d = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["7d_avg"]));
             temp = ((string)j["7d_vol"]);
             if (temp == "--")
             {
@@ -456,9 +496,9 @@ namespace BTCTC
                 t.volBTC7d = BTCTUtils.StringToSatoshi(temp.Split(new Char[] { '@' })[1]);
             }
 
-            t.lo30d = BTCTUtils.StringToSatoshi((string)j["30d_low"]);
-            t.hi30d = BTCTUtils.StringToSatoshi((string)j["30d_high"]);
-            t.av30d = BTCTUtils.StringToSatoshi((string)j["30d_avg"]);
+            t.lo30d = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["30d_low"]));
+            t.hi30d = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["30d_high"]));
+            t.av30d = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["30d_avg"]));
             temp = ((string)j["30d_vol"]);
             if (temp == "--")
             {
@@ -471,7 +511,7 @@ namespace BTCTC
                 t.volBTC30d = BTCTUtils.StringToSatoshi(temp.Split(new Char[] { '@' })[1]);
             }
 
-            t.totalVol = BTCTUtils.StringToSatoshi((string)j["total_vol"]);
+            t.totalVol = BTCTUtils.StringToSatoshi(BTCTUtils.ParseTickerString((string)j["total_vol"]));
 
             return t;            
         }
@@ -529,7 +569,7 @@ namespace BTCTC
         {
             List<Order> OList = new List<Order>();
             TradeHistory t = new TradeHistory();
-
+            Debug(s);
             JObject r;
             try
             {
@@ -539,19 +579,30 @@ namespace BTCTC
             {
                 throw (new BTCTException("Invalid response format."));
             }
+           
             foreach (JProperty ch in r.Children())
             {
                 Order o = new Order();
+                Security sec = new Security();
                 JToken c = ch.First;
 
-                o.active = false;
-                o.amount = Convert.ToInt32((string)c["quantity"]);
-                o.dateTime = BTCTUtils.UnixTimeStampToDateTime(Convert.ToInt32((string)c["timestamp"]));
+                if (c.HasValues)
+                {
+                    o.active = false;
+                    o.amount = Convert.ToInt32((string)c["quantity"]);
+                    o.dateTime = BTCTUtils.UnixTimeStampToDateTime(Convert.ToInt32((string)c["timestamp"]));
+                    o.price = BTCTUtils.StringToSatoshi((string)c["amount"]);
+                    o.orderType = BTCTUtils.StringToOrderType((string)c["type"]);
+                    sec.name = (string)c["ticker"];
+                    o.security = sec;
+                    OList.Add(o);
+
+                }
 
             }
-            // HERE!
-            t.lastUpdate = DateTime.Now;
-            return null;
+            t.orders = OList;
+            t.lastUpdate = BTCTUtils.UnixTimeStampToDateTime(Convert.ToInt32((string)r.Last.First));
+            return t;
         }
 
         private void parseSuccess(string json)
@@ -626,6 +677,7 @@ namespace BTCTC
             oc.OauthScope = "all";
             oc.ConsumerKey = _consumerKey;
             oc.ConsumerSecret = _consumerSecret;
+            _isBTCT = isBTCT;
             if (isBTCT)
             {
                 _baseUrl = "https://btct.co/";

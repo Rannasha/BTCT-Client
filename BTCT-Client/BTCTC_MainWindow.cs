@@ -155,12 +155,6 @@ namespace BTCTC
             b.SerializeConfig("btct-client.dat");
         }
 
-        private void button6_Click(object sender, EventArgs e)
-        {
-
-
-        }
-
         private void button7_Click(object sender, EventArgs e)
         {
             TradeHistory t = null;
@@ -304,7 +298,7 @@ namespace BTCTC
 
             foreach (Ticker t in lt)
             {
-                Log(t.name + " -- " + t.lastQty.ToString() + "@" + t.last.ToString() + Environment.NewLine, false);
+                Log(t.name + " -- " + t.lastQty.ToString() + "@" + BTCTUtils.SatoshiToString(t.last) + Environment.NewLine, false);
             }
         }
 
@@ -350,7 +344,18 @@ namespace BTCTC
 
         private void button9_Click_1(object sender, EventArgs e)
         {
-
+            switch (cbGlobalDataSelect.SelectedIndex)
+            {
+                case 2:
+                  // getDividendHistory();
+                    break;
+                case 1:
+                    getTradeHistory();
+                    break;
+                case 0:
+                    getAllTickers();
+                    break;
+            }
         }
 
         #region DMS Auto-Transfer functions
