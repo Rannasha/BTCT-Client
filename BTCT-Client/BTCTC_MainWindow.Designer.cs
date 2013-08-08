@@ -74,6 +74,9 @@
             this.cbMaxQuantity = new System.Windows.Forms.CheckBox();
             this.lbMaxQuantity = new System.Windows.Forms.Label();
             this.tbMaxQuantity = new System.Windows.Forms.TextBox();
+            this.dtpCustomStartTime = new System.Windows.Forms.DateTimePicker();
+            this.cbCustomStartTime = new System.Windows.Forms.CheckBox();
+            this.dtpCustomStartDate = new System.Windows.Forms.DateTimePicker();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -438,6 +441,9 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.dtpCustomStartDate);
+            this.groupBox4.Controls.Add(this.cbCustomStartTime);
+            this.groupBox4.Controls.Add(this.dtpCustomStartTime);
             this.groupBox4.Controls.Add(this.cbMaxQuantity);
             this.groupBox4.Controls.Add(this.lbMaxQuantity);
             this.groupBox4.Controls.Add(this.tbMaxQuantity);
@@ -451,7 +457,7 @@
             this.groupBox4.Controls.Add(this.btnAutoTransferStart);
             this.groupBox4.Location = new System.Drawing.Point(712, 88);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(210, 180);
+            this.groupBox4.Size = new System.Drawing.Size(210, 228);
             this.groupBox4.TabIndex = 37;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "DMS Auto-Transfer";
@@ -491,7 +497,7 @@
             // btnAutoTransferStop
             // 
             this.btnAutoTransferStop.Enabled = false;
-            this.btnAutoTransferStop.Location = new System.Drawing.Point(88, 152);
+            this.btnAutoTransferStop.Location = new System.Drawing.Point(88, 196);
             this.btnAutoTransferStop.Name = "btnAutoTransferStop";
             this.btnAutoTransferStop.Size = new System.Drawing.Size(75, 23);
             this.btnAutoTransferStop.TabIndex = 38;
@@ -532,7 +538,7 @@
             // 
             // btnAutoTransferStart
             // 
-            this.btnAutoTransferStart.Location = new System.Drawing.Point(8, 152);
+            this.btnAutoTransferStart.Location = new System.Drawing.Point(8, 196);
             this.btnAutoTransferStart.Name = "btnAutoTransferStart";
             this.btnAutoTransferStart.Size = new System.Drawing.Size(75, 23);
             this.btnAutoTransferStart.TabIndex = 36;
@@ -571,6 +577,36 @@
             this.tbMaxQuantity.Name = "tbMaxQuantity";
             this.tbMaxQuantity.Size = new System.Drawing.Size(127, 20);
             this.tbMaxQuantity.TabIndex = 42;
+            // 
+            // dtpCustomStartTime
+            // 
+            this.dtpCustomStartTime.Enabled = false;
+            this.dtpCustomStartTime.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+            this.dtpCustomStartTime.Location = new System.Drawing.Point(124, 172);
+            this.dtpCustomStartTime.Name = "dtpCustomStartTime";
+            this.dtpCustomStartTime.ShowUpDown = true;
+            this.dtpCustomStartTime.Size = new System.Drawing.Size(80, 20);
+            this.dtpCustomStartTime.TabIndex = 45;
+            // 
+            // cbCustomStartTime
+            // 
+            this.cbCustomStartTime.AutoSize = true;
+            this.cbCustomStartTime.Location = new System.Drawing.Point(8, 152);
+            this.cbCustomStartTime.Name = "cbCustomStartTime";
+            this.cbCustomStartTime.Size = new System.Drawing.Size(124, 17);
+            this.cbCustomStartTime.TabIndex = 46;
+            this.cbCustomStartTime.Text = "Start from earlier time";
+            this.cbCustomStartTime.UseVisualStyleBackColor = true;
+            this.cbCustomStartTime.CheckedChanged += new System.EventHandler(this.cbCustomStartTime_CheckedChanged);
+            // 
+            // dtpCustomStartDate
+            // 
+            this.dtpCustomStartDate.Enabled = false;
+            this.dtpCustomStartDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtpCustomStartDate.Location = new System.Drawing.Point(24, 172);
+            this.dtpCustomStartDate.Name = "dtpCustomStartDate";
+            this.dtpCustomStartDate.Size = new System.Drawing.Size(96, 20);
+            this.dtpCustomStartDate.TabIndex = 47;
             // 
             // BTCTC_MainWindow
             // 
@@ -658,6 +694,9 @@
         private System.Windows.Forms.CheckBox cbMaxQuantity;
         private System.Windows.Forms.Label lbMaxQuantity;
         private System.Windows.Forms.TextBox tbMaxQuantity;
+        private System.Windows.Forms.CheckBox cbCustomStartTime;
+        private System.Windows.Forms.DateTimePicker dtpCustomStartTime;
+        private System.Windows.Forms.DateTimePicker dtpCustomStartDate;
     }
 }
 

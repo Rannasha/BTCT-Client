@@ -32,7 +32,9 @@ namespace BTCTC
             cbOrderType.SelectedIndex = 0;
             cbExpiry.SelectedIndex = 0;
             OnAuthStatusChanged(null, EventArgs.Empty);
-            b = new BTCTLink(_consumerKey, _consumerSecret, false, DebugToTextBox);
+
+            // Change 3rd argument to "false" for LTC-Global
+            b = new BTCTLink(_consumerKey, _consumerSecret, true, DebugToTextBox);
             b.AuthStatusChanged += OnAuthStatusChanged;
         }
 
@@ -389,6 +391,14 @@ namespace BTCTC
             lbMaxQuantity.Enabled = mq;
         }
 
+        private void cbCustomStartTime_CheckedChanged(object sender, EventArgs e)
+        {
+            bool cs = cbCustomStartTime.Checked;
+
+            dtpCustomStartDate.Enabled = cs;
+            dtpCustomStartTime.Enabled = cs;
+        }
+
         private void btnAutoTransferStart_Click(object sender, EventArgs e)
         {
             if (b.AuthStatus != AuthStatusType.AS_OK)
@@ -410,11 +420,6 @@ namespace BTCTC
                 Log("Interval too short, needs to be at least 2 minutes" + Environment.NewLine, false);
                 return;
             }
-
-            updateTimer = new System.Timers.Timer(interval);
-            updateTimer.SynchronizingObject = this;
-            updateTimer.Elapsed += new ElapsedEventHandler(doUpdate);
-            updateTimer.Enabled = true;
 
             readOnly = cbReadOnly.Checked;
             singleUser = cbSingleUser.Checked;
@@ -443,29 +448,63 @@ namespace BTCTC
             lbMaxQuantity.Enabled = false;
             cbMaxQuantity.Enabled = false;
             tbMaxQuantity.Enabled = false;
+            cbCustomStartTime.Enabled = false;
+            dtpCustomStartDate.Enabled = false;
+            dtpCustomStartTime.Enabled = false;
 
             btnAutoTransferStart.Enabled = false;
             btnAutoTransferStop.Enabled = true;
+            
+            updateTimer = new System.Timers.Timer(interval);
+            updateTimer.SynchronizingObject = this;
+            updateTimer.Elapsed += new ElapsedEventHandler(doUpdate);
+            updateTimer.Enabled = true;
 
-            TradeHistory t;
-
-            try
+            if (cbCustomStartTime.Checked)
             {
-                t = b.GetTradeHistory();
-                lastUpdate = t.orders[t.orders.Count - 1].dateTime;
-                Log("Starting auto-transfer at " + DateTime.Now.ToString() + Environment.NewLine
-                    + "Most recent entry in trade history at " + lastUpdate.ToString() + " (server time)" + Environment.NewLine, true);
+                DateTime d = dtpCustomStartDate.Value;
+                DateTime ti = dtpCustomStartTime.Value;
+
+                DateTime d0 = new DateTime(d.Year, d.Month, d.Day, ti.Hour, ti.Minute, ti.Second);
+
+                if (d0.CompareTo(DateTime.Now) > 0)
+                {
+                    Log("Can't select custom starting date/time in the future. Aborting.", false);
+                    btnAutoTransferStop_Click(sender, e);
+                    return;
+                }
+
+                lastUpdate = d0;
+                Log("Starting auto-transfer at " + DateTime.Now.ToString() + Environment.NewLine +
+                    "Starting from custom date/time: " + d0.ToString() + Environment.NewLine +
+                    "Running update function to clear back-log" + Environment.NewLine, true);
+
+                doUpdate(this, null);
             }
-            catch (BTCTException ex)
+            else
             {
-                Log("Error obtaining initial trade history - Timer aborted. Message: " + ex.Message, true);
-                btnAutoTransferStop_Click(sender, e);
-                return;
+                TradeHistory t;
+
+                try
+                {
+                    t = b.GetTradeHistory();
+                    lastUpdate = t.orders[t.orders.Count - 1].dateTime;
+                    Log("Starting auto-transfer at " + DateTime.Now.ToString() + Environment.NewLine
+                        + "Most recent entry in trade history at " + lastUpdate.ToString() + " (server time)" + Environment.NewLine, true);
+                }
+                catch (BTCTException ex)
+                {
+                    Log("Error obtaining initial trade history - Timer aborted. Message: " + ex.Message, true);
+                    btnAutoTransferStop_Click(sender, e);
+                    return;
+                }
             }
         } 
 
         private void btnAutoTransferStop_Click(object sender, EventArgs e)
         {
+            bool cs = cbCustomStartTime.Checked;
+
             updateTimer.Enabled = false;
 
             lbInterval.Enabled = true;
@@ -478,6 +517,9 @@ namespace BTCTC
             cbMaxQuantity.Enabled = !readOnly;
             tbMaxQuantity.Enabled = !readOnly && qtyLimit;
             lbMaxQuantity.Enabled = !readOnly && qtyLimit;
+
+            dtpCustomStartDate.Enabled = cs;
+            dtpCustomStartTime.Enabled = cs;
 
             btnAutoTransferStart.Enabled = true;
             btnAutoTransferStop.Enabled = false;
