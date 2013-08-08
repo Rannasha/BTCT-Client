@@ -450,6 +450,8 @@ namespace BTCTC
             
             Log("Update started at " + DateTime.Now.ToString() + Environment.NewLine, true);
 
+
+
             TradeHistory t;
             try
             {
@@ -457,7 +459,7 @@ namespace BTCTC
             }
             catch (BTCTException ex)
             {
-                Log("Error obtaining trade history. Message: " + ex.Message, true);
+                Log("Error obtaining trade history. Message: " + ex.Message + Environment.NewLine, true);
                 return;
             }
 

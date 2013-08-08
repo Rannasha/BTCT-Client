@@ -258,21 +258,27 @@ namespace BTCTC
         private string rawHttpRequest(string uri)
         {
             string c = String.Empty;
-            
+
             try
             {
                 System.Net.HttpWebRequest request = System.Net.HttpWebRequest.Create(uri) as System.Net.HttpWebRequest;
                 request.ProtocolVersion = HttpVersion.Version10;
-                System.Net.HttpWebResponse response = request.GetResponse() as System.Net.HttpWebResponse;
-                System.IO.StreamReader reader = new System.IO.StreamReader(response.GetResponseStream());
-                while (reader.Peek() > 0)
+                using (System.Net.HttpWebResponse response = request.GetResponse() as System.Net.HttpWebResponse)
                 {
-                    c += reader.ReadLine() + Environment.NewLine;
+                    System.IO.StreamReader reader = new System.IO.StreamReader(response.GetResponseStream());
+                    while (reader.Peek() > 0)
+                    {
+                        c += reader.ReadLine() + Environment.NewLine;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 throw (new BTCTException("Network Error. Message: " + ex.Message));
+            }
+            finally
+            {
+                GC.Collect();
             }
             if (c == "Request rate limit exceeded, come back in 60 seconds.\r\n")
             {
