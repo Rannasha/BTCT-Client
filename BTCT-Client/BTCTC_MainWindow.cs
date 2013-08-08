@@ -16,8 +16,14 @@ namespace BTCTC
 {
     public partial class BTCTC_MainWindow : Form
     {
+      // BTCT
         private const string _consumerKey = "20bd6751441ff12b98117f4be1c09a9371de4cf7";
         private const string _consumerSecret = "0949565dac0d493501a84cbab79a0f9eb6c936a9";
+
+        // LTC-Global
+     //   private const string _consumerKey = "e16d295063cb4e22fb6247e2e8b094deef601183";
+     //  private const string _consumerSecret = "0394390ae938a512de7bdd150c693819c9c58a58";
+
         private BTCTLink b;
 
         public BTCTC_MainWindow()
@@ -26,7 +32,7 @@ namespace BTCTC
             cbOrderType.SelectedIndex = 0;
             cbExpiry.SelectedIndex = 0;
             OnAuthStatusChanged(null, EventArgs.Empty);
-            b = new BTCTLink(_consumerKey, _consumerSecret, DebugToTextBox);
+            b = new BTCTLink(_consumerKey, _consumerSecret, false, DebugToTextBox);
             b.AuthStatusChanged += OnAuthStatusChanged;
         }
 
