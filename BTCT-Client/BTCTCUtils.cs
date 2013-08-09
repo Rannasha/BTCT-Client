@@ -210,7 +210,7 @@ namespace BTCTC
     }
     #endregion
 
-    public class BTCTLink
+    public class BTCTLink2
     {
         private string _consumerKey;
         private string _consumerSecret;
