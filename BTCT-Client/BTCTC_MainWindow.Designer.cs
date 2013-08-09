@@ -63,20 +63,10 @@
             this.label10 = new System.Windows.Forms.Label();
             this.button9 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.cbSingleUser = new System.Windows.Forms.CheckBox();
-            this.lbSingleUserName = new System.Windows.Forms.Label();
-            this.tbSingleUserName = new System.Windows.Forms.TextBox();
-            this.btnAutoTransferStop = new System.Windows.Forms.Button();
-            this.cbReadOnly = new System.Windows.Forms.CheckBox();
-            this.tbInterval = new System.Windows.Forms.TextBox();
-            this.lbInterval = new System.Windows.Forms.Label();
-            this.btnAutoTransferStart = new System.Windows.Forms.Button();
-            this.cbMaxQuantity = new System.Windows.Forms.CheckBox();
-            this.lbMaxQuantity = new System.Windows.Forms.Label();
-            this.tbMaxQuantity = new System.Windows.Forms.TextBox();
-            this.dtpCustomStartTime = new System.Windows.Forms.DateTimePicker();
-            this.cbCustomStartTime = new System.Windows.Forms.CheckBox();
-            this.dtpCustomStartDate = new System.Windows.Forms.DateTimePicker();
+            this.tbTicker = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.btnSingleTicker = new System.Windows.Forms.Button();
+            this.cbSingleTicker = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -121,7 +111,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(492, 3);
+            this.button3.Location = new System.Drawing.Point(156, 416);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 8;
@@ -161,7 +151,7 @@
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(492, 29);
+            this.button7.Location = new System.Drawing.Point(236, 416);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(75, 23);
             this.button7.TabIndex = 13;
@@ -385,7 +375,7 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(572, 3);
+            this.button6.Location = new System.Drawing.Point(316, 416);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(75, 23);
             this.button6.TabIndex = 33;
@@ -412,7 +402,7 @@
             this.groupBox3.Controls.Add(this.label10);
             this.groupBox3.Controls.Add(this.button9);
             this.groupBox3.Controls.Add(this.cbGlobalDataSelect);
-            this.groupBox3.Location = new System.Drawing.Point(492, 88);
+            this.groupBox3.Location = new System.Drawing.Point(492, 12);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(210, 72);
             this.groupBox3.TabIndex = 35;
@@ -441,172 +431,62 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.dtpCustomStartDate);
-            this.groupBox4.Controls.Add(this.cbCustomStartTime);
-            this.groupBox4.Controls.Add(this.dtpCustomStartTime);
-            this.groupBox4.Controls.Add(this.cbMaxQuantity);
-            this.groupBox4.Controls.Add(this.lbMaxQuantity);
-            this.groupBox4.Controls.Add(this.tbMaxQuantity);
-            this.groupBox4.Controls.Add(this.cbSingleUser);
-            this.groupBox4.Controls.Add(this.lbSingleUserName);
-            this.groupBox4.Controls.Add(this.tbSingleUserName);
-            this.groupBox4.Controls.Add(this.btnAutoTransferStop);
-            this.groupBox4.Controls.Add(this.cbReadOnly);
-            this.groupBox4.Controls.Add(this.tbInterval);
-            this.groupBox4.Controls.Add(this.lbInterval);
-            this.groupBox4.Controls.Add(this.btnAutoTransferStart);
-            this.groupBox4.Location = new System.Drawing.Point(712, 88);
+            this.groupBox4.Controls.Add(this.cbSingleTicker);
+            this.groupBox4.Controls.Add(this.tbTicker);
+            this.groupBox4.Controls.Add(this.label11);
+            this.groupBox4.Controls.Add(this.btnSingleTicker);
+            this.groupBox4.Location = new System.Drawing.Point(492, 88);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(210, 228);
-            this.groupBox4.TabIndex = 37;
+            this.groupBox4.Size = new System.Drawing.Size(210, 72);
+            this.groupBox4.TabIndex = 36;
             this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "DMS Auto-Transfer";
+            this.groupBox4.Text = "Single ticker";
             // 
-            // cbSingleUser
+            // tbTicker
             // 
-            this.cbSingleUser.AutoSize = true;
-            this.cbSingleUser.Enabled = false;
-            this.cbSingleUser.Location = new System.Drawing.Point(8, 64);
-            this.cbSingleUser.Name = "cbSingleUser";
-            this.cbSingleUser.Size = new System.Drawing.Size(161, 17);
-            this.cbSingleUser.TabIndex = 41;
-            this.cbSingleUser.Text = "Transfer only to specific user";
-            this.cbSingleUser.UseVisualStyleBackColor = true;
-            this.cbSingleUser.CheckedChanged += new System.EventHandler(this.cbSingleUser_CheckedChanged);
+            this.tbTicker.Location = new System.Drawing.Point(72, 20);
+            this.tbTicker.Margin = new System.Windows.Forms.Padding(2);
+            this.tbTicker.Name = "tbTicker";
+            this.tbTicker.Size = new System.Drawing.Size(127, 20);
+            this.tbTicker.TabIndex = 35;
             // 
-            // lbSingleUserName
+            // label11
             // 
-            this.lbSingleUserName.AutoSize = true;
-            this.lbSingleUserName.Enabled = false;
-            this.lbSingleUserName.Location = new System.Drawing.Point(16, 88);
-            this.lbSingleUserName.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lbSingleUserName.Name = "lbSingleUserName";
-            this.lbSingleUserName.Size = new System.Drawing.Size(55, 13);
-            this.lbSingleUserName.TabIndex = 40;
-            this.lbSingleUserName.Text = "Username";
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(28, 24);
+            this.label11.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(37, 13);
+            this.label11.TabIndex = 33;
+            this.label11.Text = "Ticker";
             // 
-            // tbSingleUserName
+            // btnSingleTicker
             // 
-            this.tbSingleUserName.Enabled = false;
-            this.tbSingleUserName.Location = new System.Drawing.Point(76, 84);
-            this.tbSingleUserName.Margin = new System.Windows.Forms.Padding(2);
-            this.tbSingleUserName.Name = "tbSingleUserName";
-            this.tbSingleUserName.Size = new System.Drawing.Size(127, 20);
-            this.tbSingleUserName.TabIndex = 39;
+            this.btnSingleTicker.Location = new System.Drawing.Point(8, 44);
+            this.btnSingleTicker.Margin = new System.Windows.Forms.Padding(2);
+            this.btnSingleTicker.Name = "btnSingleTicker";
+            this.btnSingleTicker.Size = new System.Drawing.Size(75, 23);
+            this.btnSingleTicker.TabIndex = 34;
+            this.btnSingleTicker.Text = "Submit";
+            this.btnSingleTicker.UseVisualStyleBackColor = true;
+            this.btnSingleTicker.Click += new System.EventHandler(this.btnSingleTicker_Click);
             // 
-            // btnAutoTransferStop
+            // cbSingleTicker
             // 
-            this.btnAutoTransferStop.Enabled = false;
-            this.btnAutoTransferStop.Location = new System.Drawing.Point(88, 196);
-            this.btnAutoTransferStop.Name = "btnAutoTransferStop";
-            this.btnAutoTransferStop.Size = new System.Drawing.Size(75, 23);
-            this.btnAutoTransferStop.TabIndex = 38;
-            this.btnAutoTransferStop.Text = "Stop";
-            this.btnAutoTransferStop.UseVisualStyleBackColor = true;
-            this.btnAutoTransferStop.Click += new System.EventHandler(this.btnAutoTransferStop_Click);
-            // 
-            // cbReadOnly
-            // 
-            this.cbReadOnly.AutoSize = true;
-            this.cbReadOnly.Checked = true;
-            this.cbReadOnly.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbReadOnly.Location = new System.Drawing.Point(8, 40);
-            this.cbReadOnly.Name = "cbReadOnly";
-            this.cbReadOnly.Size = new System.Drawing.Size(184, 17);
-            this.cbReadOnly.TabIndex = 37;
-            this.cbReadOnly.Text = "Don\'t perform transfers (read-only)";
-            this.cbReadOnly.UseVisualStyleBackColor = true;
-            this.cbReadOnly.CheckedChanged += new System.EventHandler(this.cbReadOnly_CheckedChanged);
-            // 
-            // tbInterval
-            // 
-            this.tbInterval.Location = new System.Drawing.Point(76, 16);
-            this.tbInterval.Margin = new System.Windows.Forms.Padding(2);
-            this.tbInterval.Name = "tbInterval";
-            this.tbInterval.Size = new System.Drawing.Size(127, 20);
-            this.tbInterval.TabIndex = 32;
-            // 
-            // lbInterval
-            // 
-            this.lbInterval.AutoSize = true;
-            this.lbInterval.Location = new System.Drawing.Point(4, 20);
-            this.lbInterval.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lbInterval.Name = "lbInterval";
-            this.lbInterval.Size = new System.Drawing.Size(67, 13);
-            this.lbInterval.TabIndex = 32;
-            this.lbInterval.Text = "Interval (min)";
-            // 
-            // btnAutoTransferStart
-            // 
-            this.btnAutoTransferStart.Location = new System.Drawing.Point(8, 196);
-            this.btnAutoTransferStart.Name = "btnAutoTransferStart";
-            this.btnAutoTransferStart.Size = new System.Drawing.Size(75, 23);
-            this.btnAutoTransferStart.TabIndex = 36;
-            this.btnAutoTransferStart.Text = "Start";
-            this.btnAutoTransferStart.UseVisualStyleBackColor = true;
-            this.btnAutoTransferStart.Click += new System.EventHandler(this.btnAutoTransferStart_Click);
-            // 
-            // cbMaxQuantity
-            // 
-            this.cbMaxQuantity.AutoSize = true;
-            this.cbMaxQuantity.Enabled = false;
-            this.cbMaxQuantity.Location = new System.Drawing.Point(8, 108);
-            this.cbMaxQuantity.Name = "cbMaxQuantity";
-            this.cbMaxQuantity.Size = new System.Drawing.Size(159, 17);
-            this.cbMaxQuantity.TabIndex = 44;
-            this.cbMaxQuantity.Text = "Only transfer small quantities";
-            this.cbMaxQuantity.UseVisualStyleBackColor = true;
-            this.cbMaxQuantity.CheckedChanged += new System.EventHandler(this.cbMaxQuantity_CheckedChanged);
-            // 
-            // lbMaxQuantity
-            // 
-            this.lbMaxQuantity.AutoSize = true;
-            this.lbMaxQuantity.Enabled = false;
-            this.lbMaxQuantity.Location = new System.Drawing.Point(4, 132);
-            this.lbMaxQuantity.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lbMaxQuantity.Name = "lbMaxQuantity";
-            this.lbMaxQuantity.Size = new System.Drawing.Size(70, 13);
-            this.lbMaxQuantity.TabIndex = 43;
-            this.lbMaxQuantity.Text = "Max. quantity";
-            // 
-            // tbMaxQuantity
-            // 
-            this.tbMaxQuantity.Enabled = false;
-            this.tbMaxQuantity.Location = new System.Drawing.Point(76, 128);
-            this.tbMaxQuantity.Margin = new System.Windows.Forms.Padding(2);
-            this.tbMaxQuantity.Name = "tbMaxQuantity";
-            this.tbMaxQuantity.Size = new System.Drawing.Size(127, 20);
-            this.tbMaxQuantity.TabIndex = 42;
-            // 
-            // dtpCustomStartTime
-            // 
-            this.dtpCustomStartTime.Enabled = false;
-            this.dtpCustomStartTime.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.dtpCustomStartTime.Location = new System.Drawing.Point(124, 172);
-            this.dtpCustomStartTime.Name = "dtpCustomStartTime";
-            this.dtpCustomStartTime.ShowUpDown = true;
-            this.dtpCustomStartTime.Size = new System.Drawing.Size(80, 20);
-            this.dtpCustomStartTime.TabIndex = 45;
-            // 
-            // cbCustomStartTime
-            // 
-            this.cbCustomStartTime.AutoSize = true;
-            this.cbCustomStartTime.Location = new System.Drawing.Point(8, 152);
-            this.cbCustomStartTime.Name = "cbCustomStartTime";
-            this.cbCustomStartTime.Size = new System.Drawing.Size(124, 17);
-            this.cbCustomStartTime.TabIndex = 46;
-            this.cbCustomStartTime.Text = "Start from earlier time";
-            this.cbCustomStartTime.UseVisualStyleBackColor = true;
-            this.cbCustomStartTime.CheckedChanged += new System.EventHandler(this.cbCustomStartTime_CheckedChanged);
-            // 
-            // dtpCustomStartDate
-            // 
-            this.dtpCustomStartDate.Enabled = false;
-            this.dtpCustomStartDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpCustomStartDate.Location = new System.Drawing.Point(24, 172);
-            this.dtpCustomStartDate.Name = "dtpCustomStartDate";
-            this.dtpCustomStartDate.Size = new System.Drawing.Size(96, 20);
-            this.dtpCustomStartDate.TabIndex = 47;
+            this.cbSingleTicker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbSingleTicker.FormattingEnabled = true;
+            this.cbSingleTicker.Items.AddRange(new object[] {
+            "Ticker",
+            "Order book",
+            "Trade history",
+            "Trade history (all)",
+            "Dividend history",
+            "Contract data"});
+            this.cbSingleTicker.Location = new System.Drawing.Point(88, 44);
+            this.cbSingleTicker.Margin = new System.Windows.Forms.Padding(2);
+            this.cbSingleTicker.Name = "cbSingleTicker";
+            this.cbSingleTicker.Size = new System.Drawing.Size(111, 21);
+            this.cbSingleTicker.TabIndex = 32;
             // 
             // BTCTC_MainWindow
             // 
@@ -683,20 +563,10 @@
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.CheckBox cbReadOnly;
-        private System.Windows.Forms.TextBox tbInterval;
-        private System.Windows.Forms.Label lbInterval;
-        private System.Windows.Forms.Button btnAutoTransferStart;
-        private System.Windows.Forms.CheckBox cbSingleUser;
-        private System.Windows.Forms.Label lbSingleUserName;
-        private System.Windows.Forms.TextBox tbSingleUserName;
-        private System.Windows.Forms.Button btnAutoTransferStop;
-        private System.Windows.Forms.CheckBox cbMaxQuantity;
-        private System.Windows.Forms.Label lbMaxQuantity;
-        private System.Windows.Forms.TextBox tbMaxQuantity;
-        private System.Windows.Forms.CheckBox cbCustomStartTime;
-        private System.Windows.Forms.DateTimePicker dtpCustomStartTime;
-        private System.Windows.Forms.DateTimePicker dtpCustomStartDate;
+        private System.Windows.Forms.ComboBox cbSingleTicker;
+        private System.Windows.Forms.TextBox tbTicker;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Button btnSingleTicker;
     }
 }
 
