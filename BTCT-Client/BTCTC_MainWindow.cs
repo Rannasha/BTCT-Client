@@ -523,6 +523,7 @@ namespace BTCTC
             tbMaxQuantity.Enabled = !readOnly && qtyLimit;
             lbMaxQuantity.Enabled = !readOnly && qtyLimit;
 
+            cbCustomStartTime.Enabled = true;
             dtpCustomStartDate.Enabled = cs;
             dtpCustomStartTime.Enabled = cs;
 
