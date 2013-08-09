@@ -64,26 +64,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BTCTCUtils.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="BTCTC_MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="BTCTC_MainWindow.Designer.cs">
       <DependentUpon>BTCTC_MainWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="OAuthBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="OAuthConfig.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="OAuthConsumer.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="OAuthRequest.cs">
-      <SubType>Code</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -130,6 +115,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BTCTLink\BTCTLink\BTCTLink.csproj">
+      <Project>{46780927-6cc0-4ec7-ae66-5801d6da95dc}</Project>
+      <Name>BTCTLink</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
