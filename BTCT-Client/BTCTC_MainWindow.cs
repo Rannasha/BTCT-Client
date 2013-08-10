@@ -302,6 +302,20 @@ namespace BTCTC
             }
         }
 
+        private void getTicker(string ticker)
+        {
+            try
+            {
+                Ticker t = b.GetTicker(ticker.ToUpper());
+                Log(t.name + " -- " + t.lastQty.ToString() + "@" + BTCTUtils.SatoshiToString(t.last) + Environment.NewLine, false);
+            }
+            catch (BTCTException e)
+            {
+                Log("Error: " + e.Message, false);
+                return;
+            }
+        }
+
         private void getTradeHistory(string ticker, bool rangeAll)
         {
             TradeHistory t = null;
@@ -370,7 +384,7 @@ namespace BTCTC
             switch (cbSingleTicker.SelectedIndex)
             {
                 case 0:
-   //                 getTicker(ticker);
+                    getTicker(ticker);
                     break;
                 case 1:
      //               getOrderBook(ticker);
