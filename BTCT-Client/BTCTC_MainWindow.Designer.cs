@@ -63,10 +63,11 @@
             this.label10 = new System.Windows.Forms.Label();
             this.button9 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.cbSingleTicker = new System.Windows.Forms.ComboBox();
             this.tbTicker = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
             this.btnSingleTicker = new System.Windows.Forms.Button();
-            this.cbSingleTicker = new System.Windows.Forms.ComboBox();
+            this.button10 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -442,6 +443,23 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Single ticker";
             // 
+            // cbSingleTicker
+            // 
+            this.cbSingleTicker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbSingleTicker.FormattingEnabled = true;
+            this.cbSingleTicker.Items.AddRange(new object[] {
+            "Ticker",
+            "Order book",
+            "Trade history",
+            "Trade history (all)",
+            "Dividend history",
+            "Contract data"});
+            this.cbSingleTicker.Location = new System.Drawing.Point(88, 44);
+            this.cbSingleTicker.Margin = new System.Windows.Forms.Padding(2);
+            this.cbSingleTicker.Name = "cbSingleTicker";
+            this.cbSingleTicker.Size = new System.Drawing.Size(111, 21);
+            this.cbSingleTicker.TabIndex = 32;
+            // 
             // tbTicker
             // 
             this.tbTicker.Location = new System.Drawing.Point(72, 20);
@@ -471,28 +489,22 @@
             this.btnSingleTicker.UseVisualStyleBackColor = true;
             this.btnSingleTicker.Click += new System.EventHandler(this.btnSingleTicker_Click);
             // 
-            // cbSingleTicker
+            // button10
             // 
-            this.cbSingleTicker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbSingleTicker.FormattingEnabled = true;
-            this.cbSingleTicker.Items.AddRange(new object[] {
-            "Ticker",
-            "Order book",
-            "Trade history",
-            "Trade history (all)",
-            "Dividend history",
-            "Contract data"});
-            this.cbSingleTicker.Location = new System.Drawing.Point(88, 44);
-            this.cbSingleTicker.Margin = new System.Windows.Forms.Padding(2);
-            this.cbSingleTicker.Name = "cbSingleTicker";
-            this.cbSingleTicker.Size = new System.Drawing.Size(111, 21);
-            this.cbSingleTicker.TabIndex = 32;
+            this.button10.Location = new System.Drawing.Point(720, 216);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(75, 23);
+            this.button10.TabIndex = 37;
+            this.button10.Text = "button10";
+            this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.button10_Click);
             // 
             // BTCTC_MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(929, 439);
+            this.Controls.Add(this.button10);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.button6);
@@ -567,6 +579,7 @@
         private System.Windows.Forms.TextBox tbTicker;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button btnSingleTicker;
+        private System.Windows.Forms.Button button10;
     }
 }
 

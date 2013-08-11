@@ -403,5 +403,31 @@ namespace BTCTC
                     break;
             }
         }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            bool done = false;
+            DateTime dt = DateTime.Now;
+
+            while (!done)
+            {
+                if (dt.Day == 15 && (60 * dt.Hour + dt.Minute > 1070))
+                {
+                    Portfolio p = b.GetPortfolio();
+                    Log("Checking balance at " + dt.ToString() + " ... " + BTCTUtils.SatoshiToString(p.balance), true);
+
+                    if (p.balance > BTCTUtils.DoubleToSatoshi(11.0))
+                    {
+                        b.SubmitOrder("DMS.SELLING", 151, BTCTUtils.DoubleToSatoshi(0.02), OrderType.OT_SELL, 0);
+                        Log("done.", true);
+                        done = true;
+                    }
+                }
+                else
+                {
+                    System.Threading.Thread.Sleep(10 * 60 * 1000);
+                }
+            }
+        }
     }
 }
