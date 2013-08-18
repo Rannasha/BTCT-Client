@@ -53,7 +53,7 @@ namespace BTCTC
 
         private void DebugToTextBox(string msg)
         {
-        //    Log(msg + Environment.NewLine, false);
+          //  Log(msg + Environment.NewLine, false);
         }
 
         private void OnAuthStatusChanged(object sender, EventArgs e)
@@ -360,12 +360,66 @@ namespace BTCTC
             getTradeHistory("", false);
         }
 
+        private void getDividendHistory(string ticker)
+        {
+            DividendHistory dh = null;
+
+            try
+            {
+                dh = b.GetPublicDividendHistory(ticker);
+            }
+            catch (Exception ex)
+            {
+                Log("Error obtaining dividend history: " + ex.Message + Environment.NewLine, false);
+                return;
+            }
+
+            foreach (Dividend d in dh.dividends)
+            {
+                switch (d.status)
+                {
+                    case DividendStatus.DS_CANCELED:
+                        Log("(-) ", false);
+                        break;
+                    case DividendStatus.DS_QUEUED:
+                        Log("(=) ", false);
+                        break;
+                    case DividendStatus.DS_COMPLETE:
+                        Log("(+)", false);
+                        break;
+                }
+                Log("(" + d.shares.ToString() + ") ", false);
+                Log(d.security.name + " @ ", false);
+                Log(d.dividend.ToString() + Environment.NewLine, false);
+            }
+        }
+        private void getDividendHistory()
+        {
+            getDividendHistory("");
+        }
+
+        private void getContractData(string ticker)
+        {
+            ContractDetails c = null;
+            
+            try
+            {
+                c = b.GetContractDetails(ticker);
+            }
+            catch (Exception ex)
+            {
+                Log("Error obtaining dividend history: " + ex.Message + Environment.NewLine, false);
+                return;
+            }
+
+        }
+
         private void button9_Click_1(object sender, EventArgs e)
         {
             switch (cbGlobalDataSelect.SelectedIndex)
             {
                 case 2:
-                  // getDividendHistory();
+                    getDividendHistory();
                     break;
                 case 1:
                     getTradeHistory();
@@ -396,37 +450,11 @@ namespace BTCTC
                     getTradeHistory(ticker, true);
                     break;
                 case 4:
-       //             getDividendHistory(ticker);
+                    getDividendHistory(ticker);
                     break;
                 case 5:
-         //           getContractData(ticker);
+                    getContractData(ticker);
                     break;
-            }
-        }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-            bool done = false;
-            DateTime dt = DateTime.Now;
-
-            while (!done)
-            {
-                if (dt.Day == 15 && (60 * dt.Hour + dt.Minute > 1070))
-                {
-                    Portfolio p = b.GetPortfolio();
-                    Log("Checking balance at " + dt.ToString() + " ... " + BTCTUtils.SatoshiToString(p.balance), true);
-
-                    if (p.balance > BTCTUtils.DoubleToSatoshi(11.0))
-                    {
-                        b.SubmitOrder("DMS.SELLING", 151, BTCTUtils.DoubleToSatoshi(0.02), OrderType.OT_SELL, 0);
-                        Log("done.", true);
-                        done = true;
-                    }
-                }
-                else
-                {
-                    System.Threading.Thread.Sleep(10 * 60 * 1000);
-                }
             }
         }
     }
