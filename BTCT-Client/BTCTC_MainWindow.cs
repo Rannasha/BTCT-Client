@@ -408,10 +408,31 @@ namespace BTCTC
             }
             catch (Exception ex)
             {
-                Log("Error obtaining dividend history: " + ex.Message + Environment.NewLine, false);
+                Log("Error obtaining contract data: " + ex.Message + Environment.NewLine, false);
+                return;
+            }
+            Log(c.issuerDetail + Environment.NewLine, false);
+        }
+
+        private void getOrderBook(string ticker)
+        {
+            TradeHistory t = null;
+
+            try
+            {
+                t = b.GetOrderBook(ticker);
+            }
+            catch (Exception ex)
+            {
+                Log("Error obtaining order book: " + ex.Message + Environment.NewLine, false);
                 return;
             }
 
+            foreach (Order o in t.orders)
+            {
+                string bidask = o.orderType == OrderType.OT_SELL ? "ask" : "bid";
+                Log(o.security.name + " (" + bidask + ") " + o.amount.ToString() + " @ " + BTCTUtils.SatoshiToString(o.price) + Environment.NewLine, false);
+            }
         }
 
         private void button9_Click_1(object sender, EventArgs e)
@@ -441,7 +462,7 @@ namespace BTCTC
                     getTicker(ticker);
                     break;
                 case 1:
-     //               getOrderBook(ticker);
+                    getOrderBook(ticker);
                     break;
                 case 2:
                     getTradeHistory(ticker, false);
