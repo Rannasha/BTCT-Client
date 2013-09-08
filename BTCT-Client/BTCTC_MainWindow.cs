@@ -31,6 +31,7 @@ namespace BTCTC
             InitializeComponent();
             cbOrderType.SelectedIndex = 0;
             cbExpiry.SelectedIndex = 0;
+            cbTransferType.SelectedIndex = 0;
             OnAuthStatusChanged(null, EventArgs.Empty);
 
             // Change 3rd argument to "false" for LTC-Global
@@ -53,7 +54,7 @@ namespace BTCTC
 
         private void DebugToTextBox(string msg)
         {
-          //  Log(msg + Environment.NewLine, false);
+//            Log(msg + Environment.NewLine, false);
         }
 
         private void OnAuthStatusChanged(object sender, EventArgs e)
@@ -103,9 +104,29 @@ namespace BTCTC
             b.GetAccessToken(textBox3.Text);
             Portfolio p = b.GetPortfolio();
             b.ApiKey = p.apiKey;
-            textBox1.Text = b.ApiKey;
+            tbApiKey.Text = b.ApiKey;
         }
 
+        private void btnPortfolioApi_Click(object sender, EventArgs e)
+        {
+            Portfolio p;
+            try
+            {
+                p = b.GetPortfolioApi();
+            }
+            catch (BTCTException ex)
+            {
+                Log("Error getting portfolio. Error-message: " + ex.Message, false);
+                return;
+            }
+
+            Log("Generated: " + p.lastUpdate.ToString() + Environment.NewLine, false);
+            foreach (SecurityOwned so in p.securities)
+            {
+                Log(so.security.name + " (" + Convert.ToString(so.amount) + ")" + Environment.NewLine, false);
+            }
+        }
+        
         private void button3_Click(object sender, EventArgs e)
         {
             Portfolio p;
@@ -146,12 +167,12 @@ namespace BTCTC
         private void button4_Click(object sender, EventArgs e)
         {
             b.DeserializeConfig("btct-client.dat");
-            textBox1.Text = b.ApiKey;
+            tbApiKey.Text = b.ApiKey;
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            b.ApiKey = textBox1.Text;
+            b.ApiKey = tbApiKey.Text;
             b.SerializeConfig("btct-client.dat");
         }
 
@@ -161,7 +182,7 @@ namespace BTCTC
 
             try
             {
-                t = b.GetTradeHistory(textBox1.Text);
+                t = b.GetTradeHistory(tbApiKey.Text);
             }
             catch (Exception ex)
             {
@@ -277,7 +298,7 @@ namespace BTCTC
             DividendHistory dh;
             try
             {
-                dh = b.GetDividendHistory(textBox1.Text);
+                dh = b.GetDividendHistory(tbApiKey.Text);
             }
             catch (BTCTException ex)
             {
@@ -476,6 +497,95 @@ namespace BTCTC
                 case 5:
                     getContractData(ticker);
                     break;
+            }
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            long amount;
+
+            if (cbTransferType.SelectedIndex == 1)
+            {
+                try
+                {
+                    amount = Convert.ToInt32(tbTransferAmount.Text);
+                }
+                catch (Exception ex)
+                {
+                    Log("Invalid input in field 'amount'" + Environment.NewLine, false);
+                    return;
+                }
+
+                transferAssets(tbTransferSecurity.Text, amount, tbTransferUser.Text);
+            }
+            else
+            {
+                amount = BTCTUtils.StringToSatoshi(tbTransferAmount.Text);
+                transferCoins(amount, tbTransferUser.Text);
+            }
+        }
+
+        private void transferCoins(long amount, string user)
+        {
+            try
+            {
+                b.TransferCoins(amount, user, "");
+            }
+            catch (BTCTException e)
+            {
+                Log("Error: " + e.Message + Environment.NewLine, false);
+            }
+        }
+
+        private void transferAssets(string security, long amount, string user)
+        {
+            try
+            {
+                b.TransferAsset(security, (int)amount, user, 0);
+            }
+            catch (BTCTException e)
+            {
+                Log("Error: " + e.Message + Environment.NewLine, false);
+            }
+        }
+
+        private void cbTransferType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            tbTransferSecurity.Enabled = (cbTransferType.SelectedIndex == 1);
+            lbTransferSecurity.Enabled = (cbTransferType.SelectedIndex == 1);
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DWHistory dwh = b.GetDepositHistory(tbApiKey.Text);
+
+                foreach (DWHistoryItem d in dwh.Items)
+                {
+                    Log("(" + d.transferId + ") " + d.description + ": " + BTCTUtils.SatoshiToString(d.amount) + Environment.NewLine, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("Error: " + ex.Message + Environment.NewLine, false);
+            }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DWHistory dwh = b.GetWithdrawalHistory(tbApiKey.Text);
+
+                foreach (DWHistoryItem d in dwh.Items)
+                {
+                    Log("(" + d.transferId + ") " + d.description + ": " + BTCTUtils.SatoshiToString(d.amount) + Environment.NewLine, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("Error: " + ex.Message + Environment.NewLine, false);
             }
         }
     }
