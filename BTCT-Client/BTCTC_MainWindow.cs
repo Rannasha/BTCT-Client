@@ -1,4 +1,15 @@
-﻿using System;
+﻿/* -- BTCTClient -- Simple client to interact with the BTC-TC / LTC-Global API, using BTCTLink --
+ * 
+ * Developed by Rannasha (Bitcointalk.org: https://bitcointalk.org/index.php?action=profile;u=112258)
+ * 
+ * This basic client implements the functions of the BTCTLink class and serves as a demo-client
+ * for BTCTLink. While the client is fully functional, it is not intended to be a replacement
+ * for the current webinterfaces of BTC-TC & LTC-Global, but it can serve as a platform to be extended
+ * with more advanced functionality that is not provided by the BTC-TC & LTC-Global websites.
+ * 
+ * For details and instructions, consult readme.md of the BTCTLink repository.
+ */
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,13 +27,19 @@ namespace BTCTC
 {
     public partial class BTCTC_MainWindow : Form
     {
-      // BTCT
-        private const string _consumerKey = "20bd6751441ff12b98117f4be1c09a9371de4cf7";
-        private const string _consumerSecret = "0949565dac0d493501a84cbab79a0f9eb6c936a9";
+        /* These consumer key/secret pairs will identify the application as "BTCTLink Demo Client"
+         * when trying to authenticate. Generate new keypairs for your own application, so it is
+         * properly identified. To do so, go to the Account page and then the API Management tab on
+         * the website.
+         */
+
+        // BTC-TC
+        private const string _consumerKey = "7c87e230822bde4411f7297a065e829c96335f93";
+        private const string _consumerSecret = "2695288bc28a7a58fce1343832441a650de722d9";
 
         // LTC-Global
-     //   private const string _consumerKey = "e16d295063cb4e22fb6247e2e8b094deef601183";
-     //  private const string _consumerSecret = "0394390ae938a512de7bdd150c693819c9c58a58";
+        // private const string _consumerKey = "6ee9b3be9c45d3598ff797f734034c8de366a30d";
+        // private const string _consumerSecret = "c720009f98164fc6c809fd9b3cf5f2563b176bac";
 
         private BTCTLink b;
 
@@ -54,7 +71,8 @@ namespace BTCTC
 
         private void DebugToTextBox(string msg)
         {
-//            Log(msg + Environment.NewLine, false);
+            // Uncomment this to have unprocessed response strings displayed in the output-textbox.
+            // Log(msg + Environment.NewLine, false);
         }
 
         private void OnAuthStatusChanged(object sender, EventArgs e)
@@ -73,35 +91,35 @@ namespace BTCTC
             switch (ea.AuthStatus)
             {
                 case AuthStatusType.AS_NONE:
-                    button1.Enabled = true;
-                    button2.Enabled = false;
-                    textBox3.ReadOnly = true;
-                    textBox2.Text = "None";
+                    btnConnect.Enabled = true;
+                    btnAuthorize.Enabled = false;
+                    tbVerifier.ReadOnly = true;
+                    tbAuthStatus.Text = "None";
                     break;
                 case AuthStatusType.AS_REQRCV:
-                    button1.Enabled = true;
-                    button2.Enabled = true;
-                    textBox3.ReadOnly = false;
-                    textBox2.Text = "Req-rcv";
+                    btnConnect.Enabled = true;
+                    btnAuthorize.Enabled = true;
+                    tbVerifier.ReadOnly = false;
+                    tbAuthStatus.Text = "Req-rcv";
                     break;
                 case AuthStatusType.AS_OK:
-                    button1.Enabled = false;
-                    button2.Enabled = false;
-                    textBox3.ReadOnly = true;
-                    textBox2.Text = "Authorized";
+                    btnConnect.Enabled = false;
+                    btnAuthorize.Enabled = false;
+                    tbVerifier.ReadOnly = true;
+                    tbAuthStatus.Text = "Authorized";
                     break;
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnConnect_Click(object sender, EventArgs e)
         {
             b.GetRequestToken();
             MessageBox.Show("After authorizing BTCT-Client in the browser window that just opened, copy/paste the \"oauth_verifier\" into the \"Verifier\" textbox and click \"Authorize\"", "BTCT-Client: Authorization in progress", MessageBoxButtons.OK);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void btnAuthorize_Click(object sender, EventArgs e)
         {
-            b.GetAccessToken(textBox3.Text);
+            b.GetAccessToken(tbVerifier.Text);
             Portfolio p = b.GetPortfolio();
             b.ApiKey = p.apiKey;
             tbApiKey.Text = b.ApiKey;
@@ -164,19 +182,19 @@ namespace BTCTC
             }
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void btnLoadtoken_Click(object sender, EventArgs e)
         {
             b.DeserializeConfig("btct-client.dat");
             tbApiKey.Text = b.ApiKey;
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void btnSaveToken_Click(object sender, EventArgs e)
         {
             b.ApiKey = tbApiKey.Text;
             b.SerializeConfig("btct-client.dat");
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private void btnTradeHist_Click(object sender, EventArgs e)
         {
             TradeHistory t = null;
 
@@ -219,7 +237,7 @@ namespace BTCTC
 
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void btnCancelOrder_Click(object sender, EventArgs e)
         {
             int id;
 
@@ -293,7 +311,7 @@ namespace BTCTC
             }
         }
 
-        private void button6_Click_1(object sender, EventArgs e)
+        private void btnDivHist_Click(object sender, EventArgs e)
         {
             DividendHistory dh;
             try
@@ -456,7 +474,7 @@ namespace BTCTC
             }
         }
 
-        private void button9_Click_1(object sender, EventArgs e)
+        private void btnGlobalData_Click(object sender, EventArgs e)
         {
             switch (cbGlobalDataSelect.SelectedIndex)
             {
