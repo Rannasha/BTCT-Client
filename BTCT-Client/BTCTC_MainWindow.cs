@@ -606,5 +606,17 @@ namespace BTCTC
                 Log("Error: " + ex.Message + Environment.NewLine, false);
             }
         }
+
+        private void LogArb(string msg)
+        {
+            Log(msg, false);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DMSArb d = new DMSArb(b, 120000, 100, 0.004);
+            d.Logger = LogArb;
+            d.StartTimer(this);
+        }
     }
 }

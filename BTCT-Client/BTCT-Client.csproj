@@ -70,6 +70,7 @@
     <Compile Include="BTCTC_MainWindow.Designer.cs">
       <DependentUpon>BTCTC_MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="DMSArb.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="BTCTC_MainWindow.resx">
